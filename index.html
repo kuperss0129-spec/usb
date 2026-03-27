@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Підрозділи | SBS Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 50px 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #111;
+            border: 1px solid #222;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            border-color: #d10a14;
+            transform: translateY(-5px);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 2px solid #222;
+        }
+
+        .card:hover .card-img {
+            border-bottom-color: #d10a14;
+        }
+
+        .card-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .card-desc {
+            color: #999;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: #d10a14;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-top: auto;
+            display: inline-block;
+        }
+
+        #status { text-align: center; color: #666; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="status">Завантаження підрозділів...</div>
+<div class="grid" id="container"></div>
+
+<script>
+    // Ваше пряме посилання на CSV
+    const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQNNxXzKwY2od74LazStvqkKNBbzC215uaAYlbD2ZMcKi0DllLtZnZ5wSBdeOYHn5dx62lERbuDgp7A/pub?gid=0&single=true&output=csv';
+
+    async function getData() {
+        try {
+            const response = await fetch(url);
+            const text = await response.text();
+            
+            // Розбиваємо текст на рядки
+            const rows = text.split('\n').slice(1); // пропускаємо заголовок
+            const container = document.getElementById('container');
+            const status = document.getElementById('status');
+            
+            status.style.display = 'none';
+
+            rows.forEach(row => {
+                // Розбиваємо рядок на колонки (враховуючи коми в лапках)
+                const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                
+                if (columns && columns.length >= 3) {
+                    const name = columns[0].replace(/"/g, "");
+                    const desc = columns[1].replace(/"/g, "");
+                    const img = columns[2].replace(/"/g, "");
+                    const link = columns[3] ? columns[3].replace(/"/g, "") : "#";
+
+                    container.innerHTML += `
+                        <div class="card">
+                            <img src="${img}" class="card-img" alt="${name}">
+                            <div class="card-body">
+                                <div class="card-title">${name}</div>
+                                <div class="card-desc">${desc}</div>
+                                <a href="${link}" class="card-link" target="_blank">Детальніше →</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            document.getElementById('status').innerText = "Помилка завантаження. Спробуйте відкрити через Live Server або завантажити на хостинг.";
+        }
+    }
+
+    getData();
+</script>
+
+</body>
+</html>
