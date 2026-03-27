@@ -3,177 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Підрозділи USB</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <title>Звіт USB </title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --card-bg: #141414;
-            --accent-color: #f5c518; /* Золотистий як у СБС */
-            --text-main: #ffffff;
-            --text-dim: #a0a0a0;
-            --border-color: #222;
+            --bg-color: #050a0a;
+            --line-color: #1a2222;
+            --accent-cyan: #00f2ff; /* Бірюзовий колір тексту як на скриншоті */
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Roboto', sans-serif;
+            color: var(--text-white);
+            font-family: 'Roboto Condensed', sans-serif;
             margin: 0;
-            padding: 0;
-        }
-
-        header {
-            padding: 60px 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, #1a1a1a, var(--bg-color));
-        }
-
-        h1 {
-            font-family: 'Oswald', sans-serif;
-            font-size: 3rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin: 0;
-            color: var(--accent-color);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        /* Сітка карток */
-        .units-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-        }
-
-        /* Стиль картки */
-        .unit-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 40px 30px;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding: 20px;
             display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            min-height: 200px;
+            justify-content: center;
         }
 
-        .unit-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 3px;
-            height: 0;
-            background-color: var(--accent-color);
-            transition: height 0.3s ease;
+        .stats-container {
+            width: 100%;
+            max-width: 600px; /* Ширина як у одного блоку на фото */
+            border-top: 1px solid var(--line-color);
         }
 
-        .unit-card:hover {
-            transform: translateY(-8px);
-            border-color: #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* Заголовок таблиці */
+        .stats-header {
+            display: grid;
+            grid-template-columns: 1fr 80px 80px;
+            padding: 10px 5px;
+            color: var(--accent-cyan);
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+            text-transform: lowercase;
         }
 
-        .unit-card:hover::before {
-            height: 100%;
+        .stats-header span:first-child {
+            text-align: left;
         }
 
-        .unit-name {
-            font-family: 'Oswald', sans-serif;
-            font-size: 1.5rem;
+        /* Рядок статистики */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 80px 80px;
+            align-items: center;
+            padding: 12px 5px;
+            border-bottom: 1px solid var(--line-color);
+            transition: background 0.2s;
+        }
+
+        .stats-row:hover {
+            background: rgba(0, 242, 255, 0.03);
+        }
+
+        /* Назва та "іконка" */
+        .category-info {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 15px;
-            color: var(--text-main);
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
-        .unit-description {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: var(--text-dim);
-            margin: 0;
+        .category-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Стан завантаження */
+        /* Числа */
+        .value-cell {
+            text-align: right;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .value-total { color: var(--text-white); }
+        .value-destroyed { color: var(--text-gray); }
+
+        /* Лоадер */
         #loader {
+            color: var(--accent-cyan);
             text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            text-transform: uppercase;
+            padding: 40px;
             letter-spacing: 2px;
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2rem; }
-            .units-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Підрозділи</h1>
-    </header>
-
-    <div class="container">
-        <div id="loader">Завантаження даних...</div>
-        <div id="units-container" class="units-grid"></div>
+    <div class="stats-container">
+        <div class="stats-header">
+            <span></span>
+            <span>уражено</span>
+            <span>в т.ч. знищено</span>
+        </div>
+        
+        <div id="loader">ОТРИМАННЯ ДАНИХ...</div>
+        <div id="stats-content"></div>
     </div>
 
     <script>
-        async function fetchSheetData() {
-            // ID вашої таблиці
+        async function loadStats() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
-            // Використовуємо Google Visualization API для отримання JSON
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
             try {
                 const response = await fetch(url);
                 const text = await response.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                const rows = json.table.rows;
                 
-                // Google додає зайвий текст на початку, прибираємо його
-                const jsonData = JSON.parse(text.substring(47).slice(0, -2));
-                const rows = jsonData.table.rows;
-                
-                const container = document.getElementById('units-container');
-                const loader = document.getElementById('loader');
-                
-                loader.style.display = 'none';
+                const container = document.getElementById('stats-content');
+                document.getElementById('loader').style.display = 'none';
 
                 rows.forEach(row => {
-                    // row.c[0] — Назва, row.c[1] — Опис
-                    const name = row.c[0] ? row.c[0].v : 'Без назви';
-                    const description = row.c[1] ? row.c[1].v : '';
+                    // Припускаємо структуру таблиці: 
+                    // A (c[0]) - Назва, B (c[1]) - Уражено, C (c[2]) - Знищено
+                    const name = row.c[0] ? row.c[0].v : '—';
+                    const hit = row.c[1] ? row.c[1].v : '0';
+                    const destroyed = row.c[2] ? row.c[2].v : '0';
 
-                    const card = document.createElement('div');
-                    card.className = 'unit-card';
-                    
-                    card.innerHTML = `
-                        <div class="unit-name">${name}</div>
-                        <p class="unit-description">${description}</p>
+                    const rowHtml = `
+                        <div class="stats-row">
+                            <div class="category-info">
+                                <div class="category-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--accent-cyan)">
+                                        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                                    </svg>
+                                </div>
+                                ${name}
+                            </div>
+                            <div class="value-cell value-total">${hit}</div>
+                            <div class="value-cell value-destroyed">${destroyed}</div>
+                        </div>
                     `;
-                    
-                    container.appendChild(card);
+                    container.innerHTML += rowHtml;
                 });
-
-            } catch (error) {
-                console.error('Помилка:', error);
-                document.getElementById('loader').innerText = 'Не вдалося завантажити дані. Перевірте доступ до таблиці.';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loader').innerText = 'ПОМИЛКА ДОСТУПУ';
             }
         }
 
-        // Запуск при завантаженні сторінки
-        window.onload = fetchSheetData;
+        window.onload = loadStats;
     </script>
-
 </body>
 </html>
