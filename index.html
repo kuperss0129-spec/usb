@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Звіт ББС 125 ОВМБр</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <title>ЗВІТ ББпС 125 ОВМБр</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --bg-dark: #020606;
-            --bg-panel: #111a1a;
+            --bg-panel: #0d1414;
             --row-border: #0a1111;
             --accent-cyan: #00f2ff;
             --text-white: #ffffff;
@@ -28,12 +28,12 @@
             align-items: center;
         }
 
-        /* --- HEADER PANEL --- */
+        /* --- ВЕЛИКИЙ ЗАГОЛОВОК --- */
         .header-panel {
             width: 100%;
             background: linear-gradient(180deg, #051414 0%, var(--bg-dark) 100%);
             border-bottom: 1px solid var(--row-border);
-            padding: 12px 20px;
+            padding: 15px 25px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -43,87 +43,108 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
         .header-logo {
-            width: 35px;
-            height: 35px;
+            width: 45px;
+            height: 45px;
         }
 
         .header-title {
-            font-size: 22px;
-            font-weight: 700;
+            font-family: 'Oswald', sans-serif; /* Масивний шрифт */
+            font-size: 32px; /* Збільшений розмір */
+            line-height: 1.0;
             text-transform: uppercase;
-            line-height: 1.1;
             margin: 0;
+            letter-spacing: 1px;
         }
 
         .title-white { color: var(--text-white); }
-        .title-cyan { color: var(--accent-cyan); }
+        .title-cyan { color: var(--accent-cyan); display: block; font-size: 28px; margin-top: 2px; }
 
         .header-right {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
         }
 
         .header-block {
             background-color: var(--bg-panel);
-            padding: 8px 15px;
+            padding: 10px 18px;
             border-radius: 2px;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-panel-gray);
             display: flex;
             justify-content: center;
-            min-height: 42px;
+            min-height: 48px;
             box-sizing: border-box;
+            position: relative;
+            border: 1px solid #1a2222;
         }
 
         .time-block {
             flex-direction: column;
             color: var(--accent-cyan);
-            min-width: 100px;
+            min-width: 110px;
+            text-align: left;
+            line-height: 1.2;
         }
 
-        .dropdown-block {
+        /* Стилізація селектора періодів */
+        .dropdown-select {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
             cursor: pointer;
-            align-items: center;
-            gap: 8px;
+            appearance: none;
+            padding-right: 20px;
+            outline: none;
+            width: 100%;
         }
 
-        .dropdown-icon {
-            width: 10px;
-            fill: var(--text-panel-gray);
+        .dropdown-block::after {
+            content: "▼";
+            font-size: 10px;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--accent-cyan);
         }
 
-        /* --- STATS SECTION --- */
+        /* --- СТАТИСТИКА --- */
         .stats-wrapper {
             display: flex;
             flex-wrap: wrap;
-            gap: 30px;
+            gap: 40px;
             justify-content: center;
             max-width: 1200px;
             width: 100%;
-            padding: 30px 20px;
+            padding: 40px 20px;
             box-sizing: border-box;
         }
 
         .stats-column {
             flex: 1;
             min-width: 320px;
-            max-width: 500px;
+            max-width: 550px;
         }
 
         .table-header {
             display: grid;
-            grid-template-columns: 1fr 130px;
-            padding: 5px 0;
+            grid-template-columns: 1fr 140px;
+            padding: 8px 0;
             border-bottom: 1px solid var(--row-border);
             color: var(--accent-cyan);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             text-align: right;
             text-transform: lowercase;
@@ -133,25 +154,25 @@
             display: grid;
             grid-template-columns: 35px 1fr 65px 65px;
             align-items: center;
-            padding: 8px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--row-border);
         }
 
         .icon-cell {
             display: flex;
             justify-content: center;
-            filter: drop-shadow(0 0 2px var(--accent-cyan));
+            filter: drop-shadow(0 0 3px var(--accent-cyan));
         }
 
         .label-cell {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
         }
 
         .value-cell {
             text-align: center;
-            font-size: 17px;
+            font-size: 20px;
             font-weight: 700;
         }
 
@@ -159,15 +180,17 @@
         .val-destroyed { color: var(--text-gray); }
 
         #status-msg {
-            padding: 50px;
+            padding: 60px;
             color: var(--accent-cyan);
-            letter-spacing: 2px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
-        @media (max-width: 950px) {
-            .header-panel { flex-direction: column; gap: 15px; text-align: center; }
-            .header-left { flex-direction: column; }
-            .header-right { flex-wrap: wrap; justify-content: center; }
+        @media (max-width: 1000px) {
+            .header-panel { flex-direction: column; gap: 20px; padding: 20px; }
+            .header-title { text-align: center; font-size: 26px; }
+            .title-cyan { font-size: 22px; }
+            .header-right { width: 100%; justify-content: center; flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -179,8 +202,8 @@
                 <path d="M50 5L15 25V75L50 95L85 75V25L50 5ZM50 15L75 30V70L50 85L25 70V30L50 15Z"/>
             </svg>
             <h1 class="header-title">
-                <span class="title-white">ЗВІТ БАТАЛЬЙОНУ</span><br>
-                <span class="title-cyan">БЕЗПІЛОТНИХ СИСТЕМ 125 ОВМБр</span>
+                <span class="title-white">ЗВІТ ББпС</span>
+                <span class="title-cyan">125 ОВМБр</span>
             </h1>
         </div>
         
@@ -189,16 +212,18 @@
                 <div id="header-time">00:00:00 --</div>
                 <div id="header-date">00.00.0000</div>
             </div>
+            
+            <div class="header-block" id="current-month-display">---</div>
+
             <div class="header-block dropdown-block">
-                Березень <svg class="dropdown-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-            </div>
-            <div class="header-block dropdown-block">
-                Минулий період <svg class="dropdown-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                <select id="period-selector" class="dropdown-select">
+                    <option value="" disabled selected>Вибір періоду</option>
+                </select>
             </div>
         </div>
     </header>
 
-    <div id="status-msg">ЗАВАНТАЖЕННЯ ДАНИХ...</div>
+    <div id="status-msg">СИНХРОНІЗАЦІЯ ДАНИХ...</div>
 
     <div class="stats-wrapper" id="main-wrapper" style="display: none;">
         <div class="stats-column">
@@ -212,8 +237,12 @@
     </div>
 
     <script>
-        // Час та Дата
-        function updateTime() {
+        let allData = [];
+        const ukMonths = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", 
+                         "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
+        const currentMonthName = ukMonths[new Date().getMonth()];
+
+        function updateClock() {
             const now = new Date();
             const days = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
             document.getElementById('header-time').textContent = 
@@ -221,10 +250,11 @@
             document.getElementById('header-date').textContent = 
                 `${now.getDate().toString().padStart(2,'0')}.${(now.getMonth()+1).toString().padStart(2,'0')}.${now.getFullYear()}`;
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // Дані з Google Sheets
+        document.getElementById('current-month-display').textContent = currentMonthName;
+
         async function fetchStats() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
@@ -233,39 +263,55 @@
                 const response = await fetch(url);
                 const text = await response.text();
                 const json = JSON.parse(text.substring(47).slice(0, -2));
-                const rows = json.table.rows;
+                allData = json.table.rows;
                 
-                const colL = document.getElementById('col-left');
-                const colR = document.getElementById('col-right');
-                document.getElementById('status-msg').style.display = 'none';
-                document.getElementById('main-wrapper').style.display = 'flex';
+                const selector = document.getElementById('period-selector');
+                const monthsInSheet = [...new Set(allData.map(r => r.c[0] ? r.c[0].v : ''))]
+                    .filter(m => m && m !== currentMonthName);
 
-                const half = Math.ceil(rows.length / 2);
-
-                rows.forEach((row, index) => {
-                    // Дані з колонок B, C, D (індекси 1, 2, 3)
-                    const label = row.c[1] ? row.c[1].v : '—';
-                    const hit = row.c[2] ? row.c[2].v : '0';
-                    const dest = row.c[3] ? row.c[3].v : '0';
-
-                    const rowHtml = `
-                        <div class="data-row">
-                            <div class="icon-cell">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
-                                </svg>
-                            </div>
-                            <div class="label-cell">${label}</div>
-                            <div class="value-cell val-total">${hit}</div>
-                            <div class="value-cell val-destroyed">${dest}</div>
-                        </div>`;
-                    
-                    if (index < half) colL.innerHTML += rowHtml;
-                    else colR.innerHTML += rowHtml;
+                monthsInSheet.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m; opt.textContent = m;
+                    selector.appendChild(opt);
                 });
+
+                selector.addEventListener('change', (e) => renderStats(e.target.value));
+                
+                renderStats(currentMonthName);
+
             } catch (e) {
-                document.getElementById('status-msg').innerText = 'ПОМИЛКА З\'ЄДНАННЯ';
+                document.getElementById('status-msg').innerText = 'ПОМИЛКА ДОСТУПУ';
             }
+        }
+
+        function renderStats(month) {
+            const colL = document.getElementById('col-left');
+            const colR = document.getElementById('col-right');
+            colL.innerHTML = ''; colR.innerHTML = '';
+            document.getElementById('status-msg').style.display = 'none';
+            document.getElementById('main-wrapper').style.display = 'flex';
+
+            const filtered = allData.filter(r => r.c[0] && r.c[0].v === month);
+            const half = Math.ceil(filtered.length / 2);
+
+            filtered.forEach((row, i) => {
+                const label = row.c[1] ? row.c[1].v : '—';
+                const hit = row.c[2] ? row.c[2].v : '0';
+                const dest = row.c[3] ? row.c[3].v : '0';
+
+                const html = `
+                    <div class="data-row">
+                        <div class="icon-cell">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
+                            </svg>
+                        </div>
+                        <div class="label-cell">${label}</div>
+                        <div class="value-cell val-total">${hit}</div>
+                        <div class="value-cell val-destroyed">${dest}</div>
+                    </div>`;
+                if (i < half) colL.innerHTML += html; else colR.innerHTML += html;
+            });
         }
         fetchStats();
     </script>
