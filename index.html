@@ -1,105 +1,179 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Підрозділи | SBS Style</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Підрозділи USB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #141414;
+            --accent-color: #f5c518; /* Золотистий як у СБС */
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --border-color: #222;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #1a1a1a, var(--bg-color));
+        }
+
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin: 0;
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Сітка карток */
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        /* Стиль картки */
+        .unit-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 40px 30px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: 200px;
+        }
+
+        .unit-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            background-color: var(--accent-color);
+            transition: height 0.3s ease;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-8px);
+            border-color: #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .unit-card:hover::before {
+            height: 100%;
+        }
+
+        .unit-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+
+        .unit-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin: 0;
+        }
+
+        /* Стан завантаження */
+        #loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .units-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-<div id="units-grid" class="units-container">
-    <p>Завантаження підрозділів...</p>
-</div>
 
-<style>
-    /* Стилізація під мілітарі-дизайн sbs-group */
-    .units-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
-        padding: 20px;
-        background-color: #0f0f0f; /* Темний фон */
-    }
+    <header>
+        <h1>Підрозділи</h1>
+    </header>
 
-    .unit-card {
-        background: #1a1a1a;
-        border: 1px solid #333;
-        border-radius: 4px;
-        padding: 24px;
-        text-align: center;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: white;
-    }
+    <div class="container">
+        <div id="loader">Завантаження даних...</div>
+        <div id="units-container" class="units-grid"></div>
+    </div>
 
-    .unit-card:hover {
-        border-color: #ffd700; /* Золотистий колір при наведенні */
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-    }
+    <script>
+        async function fetchSheetData() {
+            // ID вашої таблиці
+            const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
+            // Використовуємо Google Visualization API для отримання JSON
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    .unit-logo {
-        width: 120px;
-        height: 120px;
-        object-fit: contain;
-        margin-bottom: 20px;
-    }
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // Google додає зайвий текст на початку, прибираємо його
+                const jsonData = JSON.parse(text.substring(47).slice(0, -2));
+                const rows = jsonData.table.rows;
+                
+                const container = document.getElementById('units-container');
+                const loader = document.getElementById('loader');
+                
+                loader.style.display = 'none';
 
-    .unit-name {
-        font-family: 'Oswald', sans-serif; /* Якщо є цей шрифт */
-        text-transform: uppercase;
-        font-size: 1.2rem;
-        margin-bottom: 12px;
-        color: #fff;
-    }
+                rows.forEach(row => {
+                    // row.c[0] — Назва, row.c[1] — Опис
+                    const name = row.c[0] ? row.c[0].v : 'Без назви';
+                    const description = row.c[1] ? row.c[1].v : '';
 
-    .unit-desc {
-        font-size: 0.9rem;
-        color: #aaa;
-        line-height: 1.5;
-    }
-</style>
-
-<script>
-    // Посилання на вашу опубліковану таблицю (формат CSV)
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTz_W1-O_H7H0vN9X-YkS_tJ9Q6p-v-DqXv_H4P-jD-fP_I9M-k/pub?output=csv';
-
-    async function loadUnits() {
-        try {
-            const response = await fetch(csvUrl);
-            const data = await response.text();
-            
-            // Розбиваємо CSV на рядки та колонки
-            const rows = data.split('\n').slice(1); // пропускаємо заголовок
-            const container = document.getElementById('units-grid');
-            container.innerHTML = ''; 
-
-            rows.forEach(row => {
-                const columns = row.split(','); // Назва, Опис, Фото
-                if (columns.length < 3) return;
-
-                const name = columns[0].trim();
-                const desc = columns[1].trim();
-                const img = columns[2].trim();
-
-                const cardHtml = `
-                    <div class="unit-card">
-                        <img src="${img}" alt="${name}" class="unit-logo">
+                    const card = document.createElement('div');
+                    card.className = 'unit-card';
+                    
+                    card.innerHTML = `
                         <div class="unit-name">${name}</div>
-                        <div class="unit-desc">${desc}</div>
-                    </div>
-                `;
-                container.innerHTML += cardHtml;
-            });
-        } catch (error) {
-            console.error('Помилка завантаження даних:', error);
-            document.getElementById('units-grid').innerHTML = '<p>Не вдалося завантажити дані.</p>';
+                        <p class="unit-description">${description}</p>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Помилка:', error);
+                document.getElementById('loader').innerText = 'Не вдалося завантажити дані. Перевірте доступ до таблиці.';
+            }
         }
-    }
 
-    loadUnits();
-</script>
-
+        // Запуск при завантаженні сторінки
+        window.onload = fetchSheetData;
+    </script>
 
 </body>
 </html>
