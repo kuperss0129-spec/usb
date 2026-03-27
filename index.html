@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Статистика USB - 2 Колонки</title>
+    <title>Звіт ББС 125 ОВМБр</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --bg-dark: #020606;
+            --bg-panel: #111a1a;
             --row-border: #0a1111;
             --accent-cyan: #00f2ff;
             --text-white: #ffffff;
             --text-gray: #7a8a8a;
+            --text-panel-gray: #b5cccc;
         }
 
         body {
@@ -20,63 +22,136 @@
             color: var(--text-white);
             font-family: 'Roboto Condensed', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Контейнер для двох колонок */
+        /* --- HEADER PANEL --- */
+        .header-panel {
+            width: 100%;
+            background: linear-gradient(180deg, #051414 0%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--row-border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 35px;
+            height: 35px;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .title-white { color: var(--text-white); }
+        .title-cyan { color: var(--accent-cyan); }
+
+        .header-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header-block {
+            background-color: var(--bg-panel);
+            padding: 8px 15px;
+            border-radius: 2px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 13px;
+            color: var(--text-panel-gray);
+            display: flex;
+            justify-content: center;
+            min-height: 42px;
+            box-sizing: border-box;
+        }
+
+        .time-block {
+            flex-direction: column;
+            color: var(--accent-cyan);
+            min-width: 100px;
+        }
+
+        .dropdown-block {
+            cursor: pointer;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-icon {
+            width: 10px;
+            fill: var(--text-panel-gray);
+        }
+
+        /* --- STATS SECTION --- */
         .stats-wrapper {
             display: flex;
             flex-wrap: wrap;
-            gap: 40px; /* Відступ між лівою та правою колонками */
+            gap: 30px;
             justify-content: center;
             max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            padding: 30px 20px;
+            box-sizing: border-box;
         }
 
         .stats-column {
             flex: 1;
             min-width: 320px;
-            max-width: 550px;
+            max-width: 500px;
         }
 
-        /* Шапка кожної колонки */
         .table-header {
             display: grid;
-            grid-template-columns: 1fr 140px;
-            padding: 8px 0;
+            grid-template-columns: 1fr 130px;
+            padding: 5px 0;
             border-bottom: 1px solid var(--row-border);
             color: var(--accent-cyan);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             text-align: right;
             text-transform: lowercase;
         }
 
-        /* Рядок даних */
         .data-row {
             display: grid;
             grid-template-columns: 35px 1fr 65px 65px;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid var(--row-border);
         }
 
         .icon-cell {
             display: flex;
             justify-content: center;
-            filter: drop-shadow(0 0 3px var(--accent-cyan));
+            filter: drop-shadow(0 0 2px var(--accent-cyan));
         }
 
         .label-cell {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
 
         .value-cell {
             text-align: center;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
         }
 
@@ -84,43 +159,73 @@
         .val-destroyed { color: var(--text-gray); }
 
         #status-msg {
-            text-align: center;
+            padding: 50px;
             color: var(--accent-cyan);
-            width: 100%;
-            padding: 20px;
             letter-spacing: 2px;
         }
 
-        @media (max-width: 768px) {
-            .stats-wrapper { flex-direction: column; align-items: center; }
-            .stats-column { width: 100%; }
+        @media (max-width: 950px) {
+            .header-panel { flex-direction: column; gap: 15px; text-align: center; }
+            .header-left { flex-direction: column; }
+            .header-right { flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <div id="status-msg">СИНХРОНІЗАЦІЯ ДАНИХ...</div>
+    <header class="header-panel">
+        <div class="header-left">
+            <svg class="header-logo" viewBox="0 0 100 100" fill="white">
+                <path d="M50 5L15 25V75L50 95L85 75V25L50 5ZM50 15L75 30V70L50 85L25 70V30L50 15Z"/>
+            </svg>
+            <h1 class="header-title">
+                <span class="title-white">ЗВІТ БАТАЛЬЙОНУ</span><br>
+                <span class="title-cyan">БЕЗПІЛОТНИХ СИСТЕМ 125 ОВМБр</span>
+            </h1>
+        </div>
+        
+        <div class="header-right">
+            <div class="header-block time-block">
+                <div id="header-time">00:00:00 --</div>
+                <div id="header-date">00.00.0000</div>
+            </div>
+            <div class="header-block dropdown-block">
+                Березень <svg class="dropdown-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div class="header-block dropdown-block">
+                Минулий період <svg class="dropdown-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+        </div>
+    </header>
+
+    <div id="status-msg">ЗАВАНТАЖЕННЯ ДАНИХ...</div>
 
     <div class="stats-wrapper" id="main-wrapper" style="display: none;">
         <div class="stats-column">
-            <div class="table-header">
-                <div></div>
-                <div>уражено в т.ч. знищено</div>
-            </div>
+            <div class="table-header"><div></div><div>уражено в т.ч. знищено</div></div>
             <div id="col-left"></div>
         </div>
-
         <div class="stats-column">
-            <div class="table-header">
-                <div></div>
-                <div>уражено в т.ч. знищено</div>
-            </div>
+            <div class="table-header"><div></div><div>уражено в т.ч. знищено</div></div>
             <div id="col-right"></div>
         </div>
     </div>
 
     <script>
-        async function fetchData() {
+        // Час та Дата
+        function updateTime() {
+            const now = new Date();
+            const days = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
+            document.getElementById('header-time').textContent = 
+                `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')} ${days[now.getDay()]}`;
+            document.getElementById('header-date').textContent = 
+                `${now.getDate().toString().padStart(2,'0')}.${(now.getMonth()+1).toString().padStart(2,'0')}.${now.getFullYear()}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Дані з Google Sheets
+        async function fetchStats() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
@@ -130,48 +235,39 @@
                 const json = JSON.parse(text.substring(47).slice(0, -2));
                 const rows = json.table.rows;
                 
-                const colLeft = document.getElementById('col-left');
-                const colRight = document.getElementById('col-right');
-                
+                const colL = document.getElementById('col-left');
+                const colR = document.getElementById('col-right');
                 document.getElementById('status-msg').style.display = 'none';
                 document.getElementById('main-wrapper').style.display = 'flex';
 
-                // Рахуємо, скільки елементів відправити в кожну колонку
                 const half = Math.ceil(rows.length / 2);
 
                 rows.forEach((row, index) => {
-                    // Колонки в Google Sheets: B=c[1], C=c[2], D=c[3]
-                    const label     = row.c[1] ? row.c[1].v : '—';
-                    const hit       = row.c[2] ? row.c[2].v : '0';
-                    const destroyed = row.c[3] ? row.c[3].v : '0';
+                    // Дані з колонок B, C, D (індекси 1, 2, 3)
+                    const label = row.c[1] ? row.c[1].v : '—';
+                    const hit = row.c[2] ? row.c[2].v : '0';
+                    const dest = row.c[3] ? row.c[3].v : '0';
 
                     const rowHtml = `
                         <div class="data-row">
                             <div class="icon-cell">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M12 8v8M8 12h8"></path>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
                                 </svg>
                             </div>
                             <div class="label-cell">${label}</div>
                             <div class="value-cell val-total">${hit}</div>
-                            <div class="value-cell val-destroyed">${destroyed}</div>
-                        </div>
-                    `;
-
-                    // Розподіляємо по колонках
-                    if (index < half) {
-                        colLeft.innerHTML += rowHtml;
-                    } else {
-                        colRight.innerHTML += rowHtml;
-                    }
+                            <div class="value-cell val-destroyed">${dest}</div>
+                        </div>`;
+                    
+                    if (index < half) colL.innerHTML += rowHtml;
+                    else colR.innerHTML += rowHtml;
                 });
             } catch (e) {
-                document.getElementById('status-msg').innerText = 'ПОМИЛКА ДОСТУПУ';
+                document.getElementById('status-msg').innerText = 'ПОМИЛКА З\'ЄДНАННЯ';
             }
         }
-
-        window.onload = fetchData;
+        fetchStats();
     </script>
 </body>
 </html>
