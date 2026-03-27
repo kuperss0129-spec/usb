@@ -4,132 +4,102 @@
     <meta charset="UTF-8">
     <title>Підрозділи | SBS Style</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #050505;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 50px 20px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: #111;
-            border: 1px solid #222;
-            transition: 0.3s;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            border-color: #d10a14;
-            transform: translateY(-5px);
-        }
-
-        .card-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-bottom: 2px solid #222;
-        }
-
-        .card:hover .card-img {
-            border-bottom-color: #d10a14;
-        }
-
-        .card-body {
-            padding: 20px;
-            flex-grow: 1;
-        }
-
-        .card-title {
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-
-        .card-desc {
-            color: #999;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .card-link {
-            text-decoration: none;
-            color: #d10a14;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            margin-top: auto;
-            display: inline-block;
-        }
-
-        #status { text-align: center; color: #666; margin-bottom: 20px; }
-    </style>
+ 
 </head>
 <body>
+<div id="units-grid" class="units-container">
+    <p>Завантаження підрозділів...</p>
+</div>
 
-<div id="status">Завантаження підрозділів...</div>
-<div class="grid" id="container"></div>
+<style>
+    /* Стилізація під мілітарі-дизайн sbs-group */
+    .units-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px;
+        background-color: #0f0f0f; /* Темний фон */
+    }
+
+    .unit-card {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: white;
+    }
+
+    .unit-card:hover {
+        border-color: #ffd700; /* Золотистий колір при наведенні */
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+
+    .unit-logo {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 20px;
+    }
+
+    .unit-name {
+        font-family: 'Oswald', sans-serif; /* Якщо є цей шрифт */
+        text-transform: uppercase;
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+        color: #fff;
+    }
+
+    .unit-desc {
+        font-size: 0.9rem;
+        color: #aaa;
+        line-height: 1.5;
+    }
+</style>
 
 <script>
-    // Ваше пряме посилання на CSV
-    const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQNNxXzKwY2od74LazStvqkKNBbzC215uaAYlbD2ZMcKi0DllLtZnZ5wSBdeOYHn5dx62lERbuDgp7A/pub?gid=0&single=true&output=csv';
+    // Посилання на вашу опубліковану таблицю (формат CSV)
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTz_W1-O_H7H0vN9X-YkS_tJ9Q6p-v-DqXv_H4P-jD-fP_I9M-k/pub?output=csv';
 
-    async function getData() {
+    async function loadUnits() {
         try {
-            const response = await fetch(url);
-            const text = await response.text();
+            const response = await fetch(csvUrl);
+            const data = await response.text();
             
-            // Розбиваємо текст на рядки
-            const rows = text.split('\n').slice(1); // пропускаємо заголовок
-            const container = document.getElementById('container');
-            const status = document.getElementById('status');
-            
-            status.style.display = 'none';
+            // Розбиваємо CSV на рядки та колонки
+            const rows = data.split('\n').slice(1); // пропускаємо заголовок
+            const container = document.getElementById('units-grid');
+            container.innerHTML = ''; 
 
             rows.forEach(row => {
-                // Розбиваємо рядок на колонки (враховуючи коми в лапках)
-                const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                
-                if (columns && columns.length >= 3) {
-                    const name = columns[0].replace(/"/g, "");
-                    const desc = columns[1].replace(/"/g, "");
-                    const img = columns[2].replace(/"/g, "");
-                    const link = columns[3] ? columns[3].replace(/"/g, "") : "#";
+                const columns = row.split(','); // Назва, Опис, Фото
+                if (columns.length < 3) return;
 
-                    container.innerHTML += `
-                        <div class="card">
-                            <img src="${img}" class="card-img" alt="${name}">
-                            <div class="card-body">
-                                <div class="card-title">${name}</div>
-                                <div class="card-desc">${desc}</div>
-                                <a href="${link}" class="card-link" target="_blank">Детальніше →</a>
-                            </div>
-                        </div>
-                    `;
-                }
+                const name = columns[0].trim();
+                const desc = columns[1].trim();
+                const img = columns[2].trim();
+
+                const cardHtml = `
+                    <div class="unit-card">
+                        <img src="${img}" alt="${name}" class="unit-logo">
+                        <div class="unit-name">${name}</div>
+                        <div class="unit-desc">${desc}</div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
             });
         } catch (error) {
-            console.error(error);
-            document.getElementById('status').innerText = "Помилка завантаження. Спробуйте відкрити через Live Server або завантажити на хостинг.";
+            console.error('Помилка завантаження даних:', error);
+            document.getElementById('units-grid').innerHTML = '<p>Не вдалося завантажити дані.</p>';
         }
     }
 
-    getData();
+    loadUnits();
 </script>
+
 
 </body>
 </html>
