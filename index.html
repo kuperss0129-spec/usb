@@ -14,8 +14,9 @@
             --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #1a2222;
-            --neon-glow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2);
-            --white-glow: 0 0 8px rgba(255, 255, 255, 0.3);
+            /* М'ЯКШИЙ НЕОН */
+            --neon-glow: 0 0 8px rgba(249, 148, 23, 0.35);
+            --white-glow: 0 0 6px rgba(255, 255, 255, 0.2);
         }
 
         html, body {
@@ -61,9 +62,9 @@
 
         /* --- TOP STATS & ANIMATIONS --- */
         @keyframes neon-pulse {
-            0% { text-shadow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2); }
-            50% { text-shadow: 0 0 15px rgba(249, 148, 23, 0.8), 0 0 30px rgba(249, 148, 23, 0.4), 0 0 40px rgba(249, 148, 23, 0.2); }
-            100% { text-shadow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2); }
+            0% { text-shadow: 0 0 8px rgba(249, 148, 23, 0.3); }
+            50% { text-shadow: 0 0 12px rgba(249, 148, 23, 0.5); }
+            100% { text-shadow: 0 0 8px rgba(249, 148, 23, 0.3); }
         }
 
         .top-stats-container { display: flex; justify-content: center; gap: 10px; width: 100%; max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box; }
@@ -71,8 +72,7 @@
         .stat-item { text-align: center; position: relative; }
         .stat-value { font-size: 42px; color: var(--accent-main); display: block; font-weight: 700; text-shadow: var(--neon-glow); }
         
-        /* Пульсація для ОС РОВ */
-        #personnel-hit { animation: neon-pulse 2.5s infinite ease-in-out; }
+        #personnel-hit { animation: neon-pulse 3s infinite ease-in-out; }
 
         .stat-label { font-size: 16px; text-transform: uppercase; color: var(--text-white); font-weight: 700; display: block; margin-top: 5px; letter-spacing: 0.5px; }
 
@@ -156,6 +156,18 @@
             if(target) target.classList.add('active');
         }
 
+        // Перевірка, чи належить період до минулого або поточного часу
+        function isPastOrCurrent(periodStr) {
+            if (!periodStr) return false;
+            const parts = periodStr.split(' ');
+            if (parts.length < 2) return false;
+            const mIdx = monthsNames.indexOf(parts[0]);
+            const y = parseInt(parts[1]);
+            if (y < currentYear) return true;
+            if (y === currentYear && mIdx <= currentMonthIdx) return true;
+            return false;
+        }
+
         function animateNumber(el, target) {
             let start = 0; const duration = 800; const startTime = performance.now();
             function update(currentTime) {
@@ -176,12 +188,7 @@
                 const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
                 allRowsRaw = json.table.rows;
 
-                const validPeriods = [...new Set(allRowsRaw.map(r => r.c[0]?.v))].filter(p => {
-                    if(!p) return false;
-                    const [m, y] = p.split(' ');
-                    const mIdx = monthsNames.indexOf(m);
-                    return parseInt(y) < currentYear || (parseInt(y) === currentYear && mIdx <= currentMonthIdx);
-                });
+                const validPeriods = [...new Set(allRowsRaw.map(r => r.c[0]?.v))].filter(p => isPastOrCurrent(p));
 
                 const menuItems = validPeriods.filter(p => p !== currentSearchString).sort((a,b) => {
                     const [mA, yA] = a.split(' '), [mB, yB] = b.split(' ');
@@ -203,14 +210,17 @@
         function calculateTopStats(filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, pTotalHit = 0, pDestroyed = 0;
             allRowsRaw.forEach(r => {
-                if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
+                const rowPeriod = r.c[0]?.v;
+                // Критична перевірка: чи відповідає рядок фільтру І чи він не з майбутнього
+                if ((rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod)) {
                     const label = r.c[1]?.v || "";
                     const vC = parseInt(r.c[2]?.v) || 0;
                     const vD = parseInt(r.c[3]?.v) || 0;
                     hits += vC; dests += vD;
                     if (label.includes("ОС РОВ")) { pTotalHit += vC; pDestroyed += vD; }
                 }
-                if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
+                // Вильоти рахуємо окремо за тими ж правилами
+                if ((rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod)) {
                     strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
@@ -228,10 +238,12 @@
         function renderAllTimeSum() { renderData("ВСІ"); setActiveBtn('all-time-btn'); }
 
         function renderData(val) {
-            let tableRows = allRowsRaw.filter(r => r.c[0]?.v === val);
+            let tableRows = allRowsRaw.filter(r => (r.c[0]?.v === val && isPastOrCurrent(r.c[0]?.v)));
             if (val === "ВСІ") {
                 const sum = {};
                 allRowsRaw.forEach(r => {
+                    const rowPeriod = r.c[0]?.v;
+                    if (!isPastOrCurrent(rowPeriod)) return; // Ігноруємо майбутні місяці
                     const lbl = r.c[1]?.v; if(!lbl) return;
                     if(!sum[lbl]) sum[lbl] = {c:0, d:0};
                     sum[lbl].c += (parseInt(r.c[2]?.v) || 0);
