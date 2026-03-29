@@ -256,30 +256,36 @@
             }
             display(tableRows, val);
         }
-
-        function display(rows, val) {
-            calculateTopStats(val);
-            const colL = document.getElementById('col-left'), colR = document.getElementById('col-right');
-            colL.innerHTML = ''; colR.innerHTML = '';
-            document.getElementById('status-msg').style.display = 'none';
-            document.getElementById('main-wrapper').style.display = 'flex';
-            document.getElementById('top-stats').style.display = 'flex';
-            
-            // Сортування таблиці за кількістю уражень (від більшого до меншого)
-            const sortedRows = rows.sort((a, b) => (Number(b.c[2]?.v) || 0) - (Number(a.c[2]?.v) || 0));
-            const half = Math.ceil(sortedRows.length / 2);
-
-            sortedRows.forEach((r, i) => {
-                if(!r.c[1]?.v) return;
-                const html = `<div class="data-row">
-                    <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                    <div class="label-cell">${r.c[1].v}</div>
-                    <div class="value-cell">${Number(r.c[2]?.v) || 0}</div>
-                    <div class="value-cell">${Number(r.c[3]?.v) || 0}</div>
-                </div>`;
-                if (i < half) colL.innerHTML += html; else colR.innerHTML += html;
-            });
-        }
+		
+		function display(rows, val) {
+		    calculateTopStats(val);
+		    const colL = document.getElementById('col-left'), colR = document.getElementById('col-right');
+		    colL.innerHTML = ''; colR.innerHTML = '';
+		    document.getElementById('status-msg').style.display = 'none';
+		    document.getElementById('main-wrapper').style.display = 'flex';
+		    document.getElementById('top-stats').style.display = 'flex';
+		    
+		    // Використовуємо оригінальний масив rows БЕЗ сортування
+		    const half = Math.ceil(rows.length / 2);
+		
+		    rows.forEach((r, i) => {
+		        if(!r.c[1]?.v) return;
+		
+		        // Перевірка на число: якщо в комірці текст або порожньо — буде 0
+		        const hitValue = Number(r.c[2]?.v) || 0;
+		        const destValue = Number(r.c[3]?.v) || 0;
+		
+		        const html = `<div class="data-row">
+		            <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+		            <div class="label-cell">${r.c[1].v}</div>
+		            <div class="value-cell">${hitValue}</div>
+		            <div class="value-cell">${destValue}</div>
+		        </div>`;
+		        
+		        if (i < half) colL.innerHTML += html; else colR.innerHTML += html;
+		    });
+		}
+		
         window.onload = fetchData;
     </script>
 </body>
