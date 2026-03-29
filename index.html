@@ -38,7 +38,7 @@
             display: flex; align-items: stretch; background: rgba(2, 6, 6, 0.7);
             backdrop-filter: blur(10px);
             height: 85px; width: 100%; border-bottom: 1px solid var(--row-border);
-            padding: 0 25px; gap: 15px; box-sizing: border-box;
+            padding: 0 25px; gap: 15px; box-sizing: border-box; z-index:1;
         }
         .nav-logo-section { display: flex; align-items: center; gap: 15px; }
         .main-title { font-size: 32px; text-transform: uppercase; white-space: nowrap; }
@@ -209,41 +209,28 @@
             } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА'; }
         }
 
-        function calculateTopStats(filterValue) {
+       function calculateTopStats(filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, pTotalHit = 0, pDestroyed = 0;
-            
             allRowsRaw.forEach(r => {
-                if (!r || !r.c) return;
-                const rowPeriod = r.c[0]?.v;
-                const isMatch = (rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod);
-                
-                if (isMatch) {
-                    const label = (r.c[1] && r.c[1].v) ? r.c[1].v.toString() : "";
-                    const valC = (r.c[2] && r.c[2].v !== null) ? Number(r.c[2].v) : 0;
-                    const valD = (r.c[3] && r.c[3].v !== null) ? Number(r.c[3].v) : 0;
-                    
-                    if (label !== "") {
-                        hits += valC; dests += valD;
-                        if (label.toUpperCase().includes("ОС РОВ")) { 
-                            pTotalHit += valC; pDestroyed += valD; 
-                        }
-                    }
-
-                    // Підрахунок вильотів (Індекси 6 та 7)
-                    const valG = (r.c[6] && r.c[6].v !== null) ? Number(r.c[6].v) : 0;
-                    const valH = (r.c[7] && r.c[7].v !== null) ? Number(r.c[7].v) : 0;
-                    if (!isNaN(valG)) strike += valG;
-                    if (!isNaN(valH)) recon += valH;
+                if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
+                    const label = r.c[1]?.v || "";
+                    const vC = parseInt(r.c[2]?.v) || 0;
+                    const vD = parseInt(r.c[3]?.v) || 0;
+                    hits += vC; dests += vD;
+                    if (label.includes("ОС РОВ")) { pTotalHit += vC; pDestroyed += vD; }
+                }
+                if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
+                    strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
+                    recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
             });
-
             animateNumber(document.getElementById('total-hit'), hits);
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
             animateNumber(document.getElementById('personnel-hit'), pTotalHit);
             animateNumber(document.getElementById('personnel-dest'), pDestroyed);
-            animateNumber(document.getElementById('personnel-wounded'), (pTotalHit - pDestroyed) > 0 ? (pTotalHit - pDestroyed) : 0);
+            animateNumber(document.getElementById('personnel-wounded'), pTotalHit - pDestroyed);
         }
 
         function renderCurrentMonth() { renderData(currentSearchString); setActiveBtn('current-month-btn'); }
