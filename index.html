@@ -53,18 +53,28 @@
         .info-block:hover { background-color: var(--bg-hover); }
         .time-date { color: var(--accent-main); font-size: 16px; line-height: 1.2; text-align: center; }
 
-        /* --- CUSTOM DROPDOWN --- */
+        /* --- ПЛАВНИЙ DROPDOWN --- */
         .custom-select-wrapper { position: relative; display: inline-block; }
         .selected-option { display: flex; align-items: center; gap: 15px; }
-        .arrow { color: var(--accent-main); font-size: 10px; }
+        .arrow { color: var(--accent-main); font-size: 10px; transition: transform 0.3s; }
 
         .dropdown-content {
-            display: none; position: absolute; top: 105%; left: 0; width: 100%;
+            display: block; position: absolute; top: 110%; left: 0; width: 100%;
             background-color: var(--bg-block); z-index: 100; border-radius: 2px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5); border: 1px solid var(--row-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid var(--row-border);
+            
+            /* Початковий стан для анімації */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .dropdown-content.show { display: block; }
+        .dropdown-content.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
 
         .dropdown-item {
             padding: 15px 20px; text-align: center; transition: background 0.2s;
@@ -74,82 +84,52 @@
         .dropdown-item:last-child { border-bottom: none; }
         .dropdown-item:hover { background-color: var(--bg-hover); color: var(--accent-main); }
 
-        /* --- TOP STATS --- */
+        /* --- STATS CARDS --- */
+        .stat-value { 
+            font-size: 42px; font-weight: 700; display: block; margin-bottom: 4px; 
+            color: var(--accent-main); text-shadow: 0 0 10px rgba(249, 148, 23, 0.2);
+        }
+        .stat-label { color: var(--text-white); font-size: 14px; text-transform: lowercase; font-weight: 700; }
+
         .top-stats-container {
             display: flex; justify-content: center; gap: 10px; width: 100%;
             max-width: 1350px; margin-top: 15px; padding: 0 20px;
         }
-
         .stat-card {
             background-color: var(--bg-block); flex: 1; display: flex;
             justify-content: center; align-items: center; padding: 25px 20px; gap: 35px; border-radius: 2px;
         }
-
         .stat-item { text-align: center; position: relative; }
         .stat-item:not(:last-child)::after {
             content: ""; position: absolute; right: -17px; top: 20%; height: 60%; width: 1px; background-color: #222;
         }
 
-        .stat-value { 
-            font-size: 42px; font-weight: 700; display: block; margin-bottom: 4px; 
-            color: var(--accent-main); 
-            text-shadow: 0 0 10px rgba(249, 148, 23, 0.2);
-        }
-        .stat-label { 
-            color: var(--text-white); 
-            font-size: 14px; text-transform: lowercase; font-weight: 700;
-        }
-
         /* --- TABLE --- */
-        .stats-wrapper {
-            display: flex; flex-wrap: wrap; gap: 40px; justify-content: center;
-            max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px;
-        }
+        .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; }
         .stats-column { flex: 1; min-width: 320px; max-width: 650px; }
-        .table-header {
-            display: grid; grid-template-columns: 1fr 160px; padding-bottom: 8px;
-            border-bottom: 1px solid var(--row-border); color: var(--accent-main);
-            font-size: 13px; text-transform: lowercase; text-align: right;
-        }
-        .data-row {
-            display: grid; grid-template-columns: 45px 1fr 75px 75px; align-items: center;
-            padding: 14px 0; border-bottom: 1px solid var(--row-border);
-        }
+        .table-header { display: grid; grid-template-columns: 1fr 160px; padding-bottom: 8px; border-bottom: 1px solid var(--row-border); color: var(--accent-main); font-size: 13px; text-transform: lowercase; text-align: right; }
+        .data-row { display: grid; grid-template-columns: 45px 1fr 75px 75px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
         .check-icon { width: 18px; height: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; }
-        .val-total { color: #fff; }
-        .val-destroyed { color: #7a8a8a; }
-
-        @media (max-width: 1100px) {
-            .top-nav { height: auto; flex-direction: column; padding: 20px; }
-            .top-stats-container { flex-direction: column; }
-            .nav-blocks { justify-content: center; flex-wrap: wrap; }
-        }
+        
+        @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } .nav-blocks { justify-content: center; } }
     </style>
 </head>
 <body>
 
     <nav class="top-nav">
         <div class="nav-logo-section">
-            <svg width="40" height="40" viewBox="0 0 100 100" fill="white">
-                <path d="M50 5L15 30V70L50 95L85 70V30L50 5ZM50 15L75 32V68L50 85L25 68V32L50 15Z"/>
-            </svg>
+            <svg width="40" height="40" viewBox="0 0 100 100" fill="white"><path d="M50 5L15 30V70L50 95L85 70V30L50 5ZM50 15L75 32V68L50 85L25 68V32L50 15Z"/></svg>
             <div class="main-title">ЗВІТ ББпС <span class="title-accent">125 ОВМБр</span></div>
         </div>
 
         <div class="nav-blocks">
-            <div class="info-block" onclick="renderAllTimeSum()">
-                <div id="clock" class="time-date">--:--:-- --<br>--.--.----</div>
-            </div>
+            <div class="info-block" onclick="renderAllTimeSum()"><div id="clock" class="time-date">--:--:--</div></div>
             <div class="info-block" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
-            
             <div class="custom-select-wrapper">
                 <div class="info-block" id="dropdown-btn">
-                    <div class="selected-option">
-                        <span>МИНУЛИЙ ПЕРІОД</span>
-                        <span class="arrow">▼</span>
-                    </div>
+                    <div class="selected-option"><span>МИНУЛИЙ ПЕРІОД</span><span class="arrow">▼</span></div>
                 </div>
                 <div class="dropdown-content" id="dropdown-menu"></div>
             </div>
@@ -172,22 +152,16 @@
         </div>
     </div>
 
-    <div id="status-msg" style="text-align:center; padding:50px; color:var(--accent-main);">СИНХРОНІЗАЦІЯ...</div>
+    <div id="status-msg" style="text-align:center; padding:50px; color:var(--accent-main);">СИНХРОНІЗАЦІЯ ДАНИХ...</div>
 
     <div class="stats-wrapper" id="main-wrapper" style="display: none;">
-        <div class="stats-column">
-            <div class="table-header"><div></div><div>уражено в т.ч. знищено</div></div>
-            <div id="col-left"></div>
-        </div>
-        <div class="stats-column">
-            <div class="table-header"><div></div><div>уражено в т.ч. знищено</div></div>
-            <div id="col-right"></div>
-        </div>
+        <div class="stats-column"><div class="table-header"><div></div><div>уражено / знищено</div></div><div id="col-left"></div></div>
+        <div class="stats-column"><div class="table-header"><div></div><div>уражено / знищено</div></div><div id="col-right"></div></div>
     </div>
 
     <script>
         const monthsNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
-        let allRowsData = []; // Усі валідні рядки з таблиці
+        let allRowsData = [];
         const now = new Date();
         const currentMonthIdx = now.getMonth();
         const currentYear = now.getFullYear();
@@ -218,33 +192,29 @@
         async function fetchData() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            document.getElementById('current-month-btn').textContent = monthsNames[currentMonthIdx].toUpperCase();
             
             try {
                 const response = await fetch(url);
                 const text = await response.text();
                 const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
                 
-                // Фільтруємо: Тільки минуле та теперішнє
+                // Зберігаємо тільки минулі та поточний періоди
                 allRowsData = json.table.rows.filter(row => {
-                    const period = row.c[0]?.v;
-                    if (!period) return false;
-                    const [mName, yStr] = period.split(' ');
-                    const mIdx = monthsNames.indexOf(mName);
-                    const year = parseInt(yStr);
-                    return year < currentYear || (year === currentYear && mIdx <= currentMonthIdx);
+                    const p = row.c[0]?.v; if(!p) return false;
+                    const [m, y] = p.split(' ');
+                    const mIdx = monthsNames.indexOf(m);
+                    return parseInt(y) < currentYear || (parseInt(y) === currentYear && mIdx <= currentMonthIdx);
                 });
 
                 const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => p !== currentSearchString);
-                periods.sort((a, b) => {
+                periods.sort((a,b) => {
                     const [mA, yA] = a.split(' '), [mB, yB] = b.split(' ');
-                    return (parseInt(yB) - parseInt(yA)) || (monthsNames.indexOf(mB) - monthsNames.indexOf(mA));
+                    return (yB - yA) || (monthsNames.indexOf(mB) - monthsNames.indexOf(mA));
                 });
 
                 periods.forEach(p => {
                     const div = document.createElement('div');
-                    div.className = 'dropdown-item';
-                    div.textContent = p;
+                    div.className = 'dropdown-item'; div.textContent = p;
                     div.onclick = () => { renderData(p); dropMenu.classList.remove('show'); };
                     dropMenu.appendChild(div);
                 });
@@ -253,29 +223,24 @@
             } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА ТАБЛИЦІ'; }
         }
 
-        function calculateTopStats(filteredRows, filterValue) {
-            let hits = 0, dests = 0, strike = 0, recon = 0, persDest = 0, persWound = 0;
+        function calculateTopStats(rows, filterValue) {
+            let hits = 0, dests = 0, strike = 0, recon = 0, pDest = 0, pWound = 0;
 
-            // 1. Рахуємо ураження з відфільтрованих для таблиці рядків
-            filteredRows.forEach(row => {
-                const label = row.c[1]?.v || "";
-                const valC = parseInt(row.c[2]?.v) || 0;
-                const valD = parseInt(row.c[3]?.v) || 0;
-                
-                hits += valC; 
-                dests += valD;
-
-                if (label.includes("ОС РОВ")) { 
-                    persDest = valD; 
-                    persWound = valC; 
-                }
+            // Техніка та ОС
+            rows.forEach(r => {
+                const label = r.c[1]?.v || "";
+                const valC = parseInt(r.c[2]?.v) || 0;
+                const valD = parseInt(r.c[3]?.v) || 0;
+                hits += valC; dests += valD;
+                if (label.includes("ОС РОВ")) { pDest = valD; pWound = valC; }
             });
 
-            // 2. Рахуємо вильоти (вони можуть бути в окремих рядках, тому шукаємо по всьому масиву періоду)
-            allRowsData.forEach(row => {
-                if (row.c[0]?.v === filterValue || filterValue === "ВСІ") {
-                    strike += (parseInt(row.c[6]?.v) || 0); 
-                    recon += (parseInt(row.c[7]?.v) || 0);  
+            // ВИЛЬОТИ (Шукаємо суму значень у стовпцях G та H для всього періоду)
+            allRowsData.forEach(r => {
+                if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
+                    // Перевіряємо стовпці 6 (G) та 7 (H)
+                    strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
+                    recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
             });
 
@@ -283,51 +248,43 @@
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
-            animateNumber(document.getElementById('personnel-hit'), persDest + persWound); 
-            animateNumber(document.getElementById('personnel-dest'), persDest);
-            animateNumber(document.getElementById('personnel-wounded'), persWound);
+            animateNumber(document.getElementById('personnel-hit'), pDest + pWound);
+            animateNumber(document.getElementById('personnel-dest'), pDest);
+            animateNumber(document.getElementById('personnel-wounded'), pWound);
         }
 
         function renderCurrentMonth() { renderData(currentSearchString); }
-        
         function renderAllTimeSum() {
-            const summary = {};
-            allRowsData.forEach(row => {
-                const label = row.c[1]?.v; if (!label) return;
-                if (!summary[label]) summary[label] = { c: 0, d: 0 };
-                summary[label].c += (parseInt(row.c[2]?.v) || 0);
-                summary[label].d += (parseInt(row.c[3]?.v) || 0);
+            const sum = {};
+            allRowsData.forEach(r => {
+                const lbl = r.c[1]?.v; if(!lbl) return;
+                if(!sum[lbl]) sum[lbl] = {c:0, d:0};
+                sum[lbl].c += (parseInt(r.c[2]?.v) || 0);
+                sum[lbl].d += (parseInt(r.c[3]?.v) || 0);
             });
-            const rows = Object.keys(summary).map(k => ({ 
-                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}] 
-            }));
+            const rows = Object.keys(sum).map(k => ({ c: [null, {v: k}, {v: sum[k].c}, {v: sum[k].d}] }));
             display(rows, "ВСІ");
         }
 
-        function renderData(filterValue) {
-            const filtered = allRowsData.filter(r => r.c[0]?.v === filterValue);
-            display(filtered, filterValue);
-        }
+        function renderData(val) { display(allRowsData.filter(r => r.c[0]?.v === val), val); }
 
-        function display(rows, filterValue) {
-            calculateTopStats(rows, filterValue);
-            const colLeft = document.getElementById('col-left'), colRight = document.getElementById('col-right');
-            colLeft.innerHTML = ''; colRight.innerHTML = '';
+        function display(rows, val) {
+            calculateTopStats(rows, val);
+            const colL = document.getElementById('col-left'), colR = document.getElementById('col-right');
+            colL.innerHTML = ''; colR.innerHTML = '';
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('main-wrapper').style.display = 'flex';
             document.getElementById('top-stats').style.display = 'flex';
-
+            
             const half = Math.ceil(rows.length / 2);
-            rows.forEach((row, index) => {
-                const v1 = parseInt(row.c[2]?.v) || 0, v2 = parseInt(row.c[3]?.v) || 0;
-                const html = `
-                    <div class="data-row">
-                        <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                        <div class="label-cell">${row.c[1]?.v || '—'}</div>
-                        <div class="value-cell val-total">${v1}</div>
-                        <div class="value-cell val-destroyed">${v2}</div>
-                    </div>`;
-                if (index < half) colLeft.innerHTML += html; else colRight.innerHTML += html;
+            rows.forEach((r, i) => {
+                const html = `<div class="data-row">
+                    <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                    <div class="label-cell">${r.c[1]?.v || '—'}</div>
+                    <div class="value-cell" style="color:#fff">${parseInt(r.c[2]?.v) || 0}</div>
+                    <div class="value-cell" style="color:#7a8a8a">${parseInt(r.c[3]?.v) || 0}</div>
+                </div>`;
+                if (i < half) colL.innerHTML += html; else colR.innerHTML += html;
             });
         }
         window.onload = fetchData;
