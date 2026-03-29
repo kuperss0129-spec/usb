@@ -14,7 +14,6 @@
             --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #1a2222;
-            /* Ефект неону */
             --neon-glow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2);
             --white-glow: 0 0 8px rgba(255, 255, 255, 0.3);
         }
@@ -27,17 +26,15 @@
 
         body { display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
 
-        /* --- HEADER --- */
+        /* --- NAVIGATION --- */
         .top-nav {
             display: flex; align-items: stretch; background-color: var(--bg-dark);
             height: 85px; width: 100%; border-bottom: 2px solid var(--row-border);
             padding: 0 25px; gap: 15px; box-sizing: border-box;
         }
-
         .nav-logo-section { display: flex; align-items: center; gap: 15px; }
         .main-title { font-size: 32px; text-transform: uppercase; white-space: nowrap; }
         .title-accent { color: var(--accent-main); }
-
         .nav-blocks { display: flex; align-items: center; gap: 12px; flex-grow: 1; justify-content: flex-end; }
 
         .info-block {
@@ -46,18 +43,9 @@
             padding: 0 25px; min-width: 160px; border-radius: 2px; cursor: pointer; 
             transition: all 0.3s ease; color: var(--text-white); font-weight: 700; 
             text-transform: uppercase; text-align: center; line-height: 1.2; font-size: 16px;
-            border: 1px solid transparent;
         }
-
         .info-block:hover { background-color: var(--bg-hover); color: var(--accent-main); }
-
-        /* Стиль для активної кнопки */
-        .info-block.active {
-            color: var(--accent-main);
-            border: 1px solid rgba(249, 148, 23, 0.3);
-            background-color: var(--bg-hover);
-            box-shadow: inset 0 0 15px rgba(249, 148, 23, 0.1);
-        }
+        .info-block.active { color: var(--accent-main); background-color: var(--bg-hover); box-shadow: inset 0 0 15px rgba(249, 148, 23, 0.1); }
 
         /* --- DROPDOWN --- */
         .custom-select-wrapper { position: relative; }
@@ -68,51 +56,36 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        .dropdown-item {
-            padding: 15px; text-align: center; border-bottom: 1px solid #1a2222;
-            transition: color 0.2s; cursor: pointer; font-size: 14px;
-        }
+        .dropdown-item { padding: 15px; text-align: center; border-bottom: 1px solid #1a2222; transition: color 0.2s; cursor: pointer; font-size: 14px; }
         .dropdown-item:hover { color: var(--accent-main); background: var(--bg-hover); }
 
-        /* --- TOP STATS --- */
-        .top-stats-container {
-            display: flex; justify-content: center; gap: 10px; width: 100%;
-            max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box;
+        /* --- TOP STATS & ANIMATIONS --- */
+        @keyframes neon-pulse {
+            0% { text-shadow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2); }
+            50% { text-shadow: 0 0 15px rgba(249, 148, 23, 0.8), 0 0 30px rgba(249, 148, 23, 0.4), 0 0 40px rgba(249, 148, 23, 0.2); }
+            100% { text-shadow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2); }
         }
+
+        .top-stats-container { display: flex; justify-content: center; gap: 10px; width: 100%; max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box; }
         .stat-card { background-color: var(--bg-block); flex: 1; display: flex; justify-content: center; align-items: center; padding: 25px 20px; gap: 35px; }
         .stat-item { text-align: center; position: relative; }
+        .stat-value { font-size: 42px; color: var(--accent-main); display: block; font-weight: 700; text-shadow: var(--neon-glow); }
         
-        /* НЕОН ДЛЯ ВЕЛИКИХ ЦИФР */
-        .stat-value { 
-            font-size: 42px; 
-            color: var(--accent-main); 
-            display: block; 
-            font-weight: 700; 
-            text-shadow: var(--neon-glow);
-        }
-        
+        /* Пульсація для ОС РОВ */
+        #personnel-hit { animation: neon-pulse 2.5s infinite ease-in-out; }
+
         .stat-label { font-size: 16px; text-transform: uppercase; color: var(--text-white); font-weight: 700; display: block; margin-top: 5px; letter-spacing: 0.5px; }
 
         /* --- TABLE --- */
         .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; box-sizing: border-box; }
-        .stats-column { flex: 1; min-width: 350px; }
-        
-        .table-header { display: grid; grid-template-columns: 1fr 180px; padding-bottom: 8px; border-bottom: 1px solid var(--row-border); color: var(--accent-main); font-size: 14px; text-transform: lowercase; }
-        .header-labels { display: flex; justify-content: space-between; text-align: center; }
-        .header-labels div { width: 85px; }
-
-        .data-row { display: grid; grid-template-columns: 45px 1fr 85px 85px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
+        .stats-column { flex: 1; min-width: 380px; }
+        .table-header { display: grid; grid-template-columns: 1fr 190px; padding-bottom: 8px; border-bottom: 1px solid var(--row-border); color: var(--accent-main); font-size: 14px; text-transform: lowercase; }
+        .header-labels { display: flex; justify-content: flex-end; gap: 10px; text-align: center; }
+        .header-labels div { width: 90px; }
+        .data-row { display: grid; grid-template-columns: 45px 1fr 90px 90px; column-gap: 5px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
         .check-icon { width: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
-        
-        /* НЕОН ДЛЯ ЦИФР У ТАБЛИЦІ */
-        .value-cell { 
-            text-align: center; 
-            font-size: 22px; 
-            font-weight: 700; 
-            color: #ffffff; 
-            text-shadow: var(--white-glow);
-        }
+        .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; text-shadow: var(--white-glow); width: 90px; }
 
         @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } .nav-blocks { justify-content: center; margin-top: 10px; } }
     </style>
@@ -125,9 +98,7 @@
             <div class="main-title">ЗВІТ ББпС <span class="title-accent">125 ОВМБр</span></div>
         </div>
         <div class="nav-blocks">
-            <div class="info-block" id="all-time-btn" onclick="renderAllTimeSum()">
-                ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)
-            </div>
+            <div class="info-block" id="all-time-btn" onclick="renderAllTimeSum()">ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)</div>
             <div class="info-block active" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
             <div class="custom-select-wrapper">
                 <div class="info-block" id="dropdown-btn">МИНУЛИЙ ПЕРІОД ▼</div>
@@ -230,9 +201,7 @@
         }
 
         function calculateTopStats(filterValue) {
-            let hits = 0, dests = 0, strike = 0, recon = 0;
-            let pTotalHit = 0, pDestroyed = 0;
-
+            let hits = 0, dests = 0, strike = 0, recon = 0, pTotalHit = 0, pDestroyed = 0;
             allRowsRaw.forEach(r => {
                 if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
                     const label = r.c[1]?.v || "";
@@ -246,7 +215,6 @@
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
             });
-
             animateNumber(document.getElementById('total-hit'), hits);
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
