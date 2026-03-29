@@ -14,9 +14,10 @@
             --accent-cyan: #00f2ff;
             --text-white: #ffffff;
             --row-border: #0a1111;
-            --header-h: 77px; 
-            --font-main: 31px;
-            --font-blocks: 20px;
+            /* Збільшено ще на 10% */
+            --header-h: 85px; 
+            --font-main: 34px;
+            --font-blocks: 22px;
         }
 
         html, body {
@@ -40,25 +41,25 @@
             height: var(--header-h);
             width: 100%;
             border-bottom: 2px solid var(--row-border);
-            padding: 0 20px;
-            gap: 12px;
+            padding: 0 25px;
+            gap: 15px;
         }
 
-        .nav-logo-section { display: flex; align-items: center; gap: 17px; padding-right: 22px; }
-        .main-title { font-size: var(--font-main); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+        .nav-logo-section { display: flex; align-items: center; gap: 20px; padding-right: 25px; }
+        .main-title { font-size: var(--font-main); letter-spacing: 0.5px; white-space: nowrap; }
         .title-cyan { color: var(--accent-cyan); }
 
-        .nav-blocks { display: flex; align-items: center; gap: 10px; flex-grow: 1; justify-content: flex-end; }
+        .nav-blocks { display: flex; align-items: center; gap: 12px; flex-grow: 1; justify-content: flex-end; }
 
         .info-block {
             background-color: var(--bg-block);
-            height: 55px;
+            height: 62px; /* +10% */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 0 28px;
-            min-width: 132px;
+            padding: 0 32px;
+            min-width: 145px;
             font-size: var(--font-blocks);
             border-radius: 2px;
             cursor: pointer;
@@ -67,9 +68,10 @@
 
         .info-block:hover { background-color: var(--bg-hover); }
 
-        .time-date { color: var(--accent-cyan); font-size: 15.5px; line-height: 1.2; text-align: center; pointer-events: none; }
+        /* Білий годинник */
+        .time-date { color: #ffffff; font-size: 17px; line-height: 1.2; text-align: center; pointer-events: none; }
 
-        /* --- СТИЛЬ ВИПАДАЮЧОГО СПИСКУ (ЯК НА СКРІНШОТІ) --- */
+        /* --- DROPDOWN STYLE --- */
         .dropdown-wrapper { position: relative; padding: 0 !important; overflow: hidden; }
 
         .dropdown-wrapper select {
@@ -81,28 +83,20 @@
             font-weight: 700;
             appearance: none;
             cursor: pointer;
-            padding: 0 45px 0 28px;
+            padding: 0 50px 0 30px;
             width: 100%;
             height: 100%;
             outline: none;
-        }
-
-        /* Стилізація пунктів меню (працює в більшості браузерів) */
-        .dropdown-wrapper select option {
-            background-color: var(--bg-block);
-            color: white;
-            padding: 15px;
-            border-bottom: 1px solid var(--row-border);
         }
 
         .dropdown-wrapper select:hover { background-color: var(--bg-hover); }
 
         .dropdown-wrapper::after {
             content: "▼";
-            font-size: 10px;
-            color: #555;
+            font-size: 11px;
+            color: #666;
             position: absolute;
-            right: 18px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
             pointer-events: none;
@@ -116,43 +110,43 @@
             justify-content: center;
             max-width: 1300px;
             width: 100%;
-            margin: 30px auto;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
-        .stats-column { flex: 1; min-width: 320px; max-width: 600px; }
+        .stats-column { flex: 1; min-width: 320px; max-width: 620px; }
 
         .table-header {
             display: grid;
-            grid-template-columns: 1fr 150px;
-            padding-bottom: 5px;
+            grid-template-columns: 1fr 160px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--row-border);
             color: var(--accent-cyan);
-            font-size: 12px;
+            font-size: 13px;
             text-transform: lowercase;
             text-align: right;
         }
 
         .data-row {
             display: grid;
-            grid-template-columns: 40px 1fr 70px 70px;
+            grid-template-columns: 45px 1fr 75px 75px;
             align-items: center;
-            padding: 12px 0;
+            padding: 14px 0;
             border-bottom: 1px solid var(--row-border);
         }
 
-        .icon-cell { display: flex; justify-content: center; opacity: 0.7; }
-        .label-cell { font-size: 15px; text-transform: uppercase; }
-        .value-cell { text-align: center; font-size: 20px; font-weight: 700; }
+        .icon-cell { display: flex; justify-content: center; opacity: 0.8; font-size: 20px; }
+        .label-cell { font-size: 16px; text-transform: uppercase; }
+        .value-cell { text-align: center; font-size: 22px; font-weight: 700; }
         .val-total { color: #fff; }
         .val-destroyed { color: #7a8a8a; }
 
-        #status-msg { text-align: center; padding: 50px; color: var(--accent-cyan); text-transform: uppercase; }
+        #status-msg { text-align: center; padding: 60px; color: var(--accent-cyan); text-transform: uppercase; font-size: 18px; }
 
-        @media (max-width: 950px) {
-            .top-nav { height: auto; flex-direction: column; padding: 15px; gap: 10px; }
+        @media (max-width: 1000px) {
+            .top-nav { height: auto; flex-direction: column; padding: 20px; gap: 15px; }
             .nav-blocks { width: 100%; justify-content: center; }
-            .info-block { width: 100%; }
+            .info-block { flex: 1; }
         }
     </style>
 </head>
@@ -160,14 +154,14 @@
 
     <nav class="top-nav">
         <div class="nav-logo-section">
-            <svg width="35" height="35" viewBox="0 0 100 100" fill="white">
+            <svg width="40" height="40" viewBox="0 0 100 100" fill="white">
                 <path d="M50 5L15 30V70L50 95L85 70V30L50 5ZM50 15L75 32V68L50 85L25 68V32L50 15Z"/>
             </svg>
-            <div class="main-title">ЗВІТ <span class="title-cyan">УГРУПОВАННЯ СБС</span></div>
+            <div class="main-title">Звіт ББпС <span class="title-cyan">125 ОВМБр</span></div>
         </div>
 
         <div class="nav-blocks">
-            <div class="info-block" onclick="renderAllTimeSum()">
+            <div class="info-block" onclick="renderAllTimeSum()" title="За весь час">
                 <div id="clock" class="time-date">--:--:-- --<br>--.--.----</div>
             </div>
             
@@ -227,29 +221,24 @@
 
                 const select = document.getElementById('period-select');
                 
-                // Отримуємо унікальні періоди та фільтруємо МАЙБУТНІ
+                // Фільтр майбутніх періодів та поточного для випадаючого списку
                 const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => {
                     if (!p) return false;
-                    const [pMonth, pYear] = p.split(' ');
-                    const pMonthIdx = monthsNames.indexOf(pMonth);
-                    const pYearNum = parseInt(pYear);
-
-                    // Умова: період не майбутній і не поточний (для списку "Минулі")
-                    const isFuture = pYearNum > currentYear || (pYearNum === currentYear && pMonthIdx > currentMonthIdx);
-                    const isCurrent = p === currentSearchString;
-                    
-                    return !isFuture && !isCurrent;
+                    const parts = p.split(' ');
+                    const mIdx = monthsNames.indexOf(parts[0]);
+                    const yNum = parseInt(parts[1]);
+                    const isFuture = yNum > currentYear || (yNum === currentYear && mIdx > currentMonthIdx);
+                    return !isFuture && p !== currentSearchString;
                 });
 
-                // Сортуємо за часом (спочатку новіші)
                 periods.sort((a, b) => {
-                    const [mA, yA] = a.split(' '); const [mB, yB] = b.split(' ');
-                    return (parseInt(yB) - parseInt(yA)) || (monthsNames.indexOf(mB) - monthsNames.indexOf(mA));
+                    const pA = a.split(' '); const pB = b.split(' ');
+                    return (parseInt(pB[1]) - parseInt(pA[1])) || (monthsNames.indexOf(pB[0]) - monthsNames.indexOf(pA[0]));
                 });
 
                 periods.forEach(p => {
                     const opt = document.createElement('option');
-                    opt.value = p; opt.textContent = p; // p вже містить "Місяць Рік"
+                    opt.value = p; opt.textContent = p;
                     select.appendChild(opt);
                 });
 
@@ -269,12 +258,10 @@
             allRowsData.forEach(row => {
                 const p = row.c[0]?.v;
                 if (!p) return;
-                
-                // Перевірка на майбутні дати в сумі
-                const [pMonth, pYear] = p.split(' ');
-                const pMonthIdx = monthsNames.indexOf(pMonth);
-                const pYearNum = parseInt(pYear);
-                if (pYearNum > currentYear || (pYearNum === currentYear && pMonthIdx > currentMonthIdx)) return;
+                const parts = p.split(' ');
+                const mIdx = monthsNames.indexOf(parts[0]);
+                const yNum = parseInt(parts[1]);
+                if (yNum > currentYear || (yNum === currentYear && mIdx > currentMonthIdx)) return;
 
                 const label = row.c[1]?.v;
                 if (!label) return;
@@ -305,7 +292,7 @@
 
             if (rows.length === 0) {
                 status.style.display = 'block';
-                status.innerText = `НЕМАЄ ДАНИХ: ${title}`;
+                status.innerText = `НЕМАЄ ДАНИХ ЗА ${title}`;
                 wrapper.style.display = 'none';
                 return;
             }
