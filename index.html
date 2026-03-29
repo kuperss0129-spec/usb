@@ -32,16 +32,10 @@
         body { display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         * { box-sizing: border-box; }
 
-        /* --- HEADER --- */
         .top-nav {
-            display: flex;
-            align-items: stretch;
-            background-color: var(--bg-dark);
-            height: var(--header-h);
-            width: 100%;
-            border-bottom: 2px solid var(--row-border);
-            padding: 0 25px;
-            gap: 15px;
+            display: flex; align-items: stretch; background-color: var(--bg-dark);
+            height: var(--header-h); width: 100%; border-bottom: 2px solid var(--row-border);
+            padding: 0 25px; gap: 15px;
         }
 
         .nav-logo-section { display: flex; align-items: center; gap: 20px; padding-right: 25px; }
@@ -51,116 +45,59 @@
         .nav-blocks { display: flex; align-items: center; gap: 12px; flex-grow: 1; justify-content: flex-end; }
 
         .info-block {
-            background-color: var(--bg-block);
-            height: 62px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 0 32px;
-            min-width: 160px;
-            font-size: var(--font-blocks);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border: none;
+            background-color: var(--bg-block); height: 62px; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            padding: 0 32px; min-width: 160px; font-size: var(--font-blocks);
+            border-radius: 2px; cursor: pointer; transition: background 0.2s; border: none;
         }
 
         .info-block:hover { background-color: var(--bg-hover); }
         .time-date { color: #ffffff; font-size: 17px; line-height: 1.2; text-align: center; pointer-events: none; }
 
-        /* --- DROPDOWN --- */
         .dropdown-wrapper { position: relative; padding: 0 !important; }
         .dropdown-wrapper select {
-            background: transparent;
-            border: none;
-            color: white;
-            font-family: inherit;
-            font-size: var(--font-blocks);
-            font-weight: 700;
-            appearance: none;
-            cursor: pointer;
-            padding: 0 50px 0 30px;
-            width: 100%;
-            height: 100%;
-            outline: none;
-            text-transform: uppercase;
+            background: transparent; border: none; color: white; font-family: inherit;
+            font-size: var(--font-blocks); font-weight: 700; appearance: none; cursor: pointer;
+            padding: 0 50px 0 30px; width: 100%; height: 100%; outline: none; text-transform: uppercase;
         }
         .dropdown-wrapper::after {
-            content: "▼";
-            font-size: 12px;
-            color: var(--accent-main);
-            position: absolute;
-            right: 20px;
-            pointer-events: none;
+            content: "▼"; font-size: 12px; color: var(--accent-main);
+            position: absolute; right: 20px; pointer-events: none;
         }
 
-        /* --- TOP STATS --- */
         .top-stats-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            max-width: 1300px;
-            margin-top: 15px;
-            padding: 0 20px;
+            display: flex; justify-content: center; gap: 10px; width: 100%;
+            max-width: 1300px; margin-top: 15px; padding: 0 20px;
         }
 
         .stat-card {
-            background-color: var(--bg-block);
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            gap: 35px;
-            border-radius: 2px;
+            background-color: var(--bg-block); flex: 1; display: flex;
+            justify-content: center; align-items: center; padding: 20px; gap: 35px; border-radius: 2px;
         }
 
         .stat-item { text-align: center; position: relative; }
         .stat-item:not(:last-child)::after {
-            content: "";
-            position: absolute;
-            right: -17px;
-            top: 20%;
-            height: 60%;
-            width: 1px;
-            background-color: #222;
+            content: ""; position: absolute; right: -17px; top: 20%; height: 60%; width: 1px; background-color: #222;
         }
 
         .stat-value { font-size: 38px; font-weight: 700; display: block; margin-bottom: 2px; }
         .stat-label { color: var(--accent-main); font-size: 14px; text-transform: lowercase; }
 
-        /* --- TABLE --- */
         .stats-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            justify-content: center;
-            max-width: 1300px;
-            width: 100%;
-            margin: 30px auto;
-            padding: 0 20px;
+            display: flex; flex-wrap: wrap; gap: 40px; justify-content: center;
+            max-width: 1300px; width: 100%; margin: 30px auto; padding: 0 20px;
         }
 
         .stats-column { flex: 1; min-width: 320px; max-width: 620px; }
         .table-header {
-            display: grid;
-            grid-template-columns: 1fr 160px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--row-border);
-            color: var(--accent-main);
-            font-size: 13px;
-            text-transform: lowercase;
-            text-align: right;
+            display: grid; grid-template-columns: 1fr 160px; padding-bottom: 8px;
+            border-bottom: 1px solid var(--row-border); color: var(--accent-main);
+            font-size: 13px; text-transform: lowercase; text-align: right;
         }
 
         .data-row {
-            display: grid;
-            grid-template-columns: 45px 1fr 75px 75px;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--row-border);
+            display: grid; grid-template-columns: 45px 1fr 75px 75px; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid var(--row-border);
             animation: fadeIn 0.4s ease-out forwards;
         }
 
@@ -291,33 +228,28 @@
         }
 
         function calculateTopStats(rows, filterValue) {
-            let hits = 0, dests = 0, strike = 0, recon = 0, persHit = 0, persDest = 0, persWound = 0;
+            let hits = 0, dests = 0, strike = 0, recon = 0;
+            let persDest = 0, persWound = 0;
 
-            // 1. Рахуємо цілі (сумуємо ВСЕ, включаючи ОС РОВ)
             rows.forEach(row => {
                 const label = row.c[1]?.v || "";
                 const valC = parseInt(row.c[2]?.v) || 0; // Col C
                 const valD = parseInt(row.c[3]?.v) || 0; // Col D
-                const valI = parseInt(row.c[8]?.v) || 0; // Col I
 
-                // Додаємо до загального лічильника
                 hits += valC;
                 dests += valD;
 
-                // Окремо накопичуємо для картки ОС РОВ
                 if (label.includes("ОС РОВ")) {
-                    persHit += valC;
-                    persDest += valD;
-                    persWound += valI;
+                    persDest = valD; // Знищено з Col D
+                    persWound = valC; // Поранено з Col C
                 }
             });
 
-            // 2. Рахуємо вильоти окремо (колонки F, G, H)
             allRowsData.forEach(row => {
                 const colF = row.c[5]?.v; 
                 if (colF === filterValue || (filterValue === "ВСІ" && colF)) {
-                    strike += (parseInt(row.c[6]?.v) || 0); // Col G
-                    recon += (parseInt(row.c[7]?.v) || 0);  // Col H
+                    strike += (parseInt(row.c[6]?.v) || 0); 
+                    recon += (parseInt(row.c[7]?.v) || 0);  
                 }
             });
 
@@ -325,7 +257,8 @@
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
-            animateNumber(document.getElementById('personnel-hit'), persHit);
+            
+            animateNumber(document.getElementById('personnel-hit'), persDest + persWound); 
             animateNumber(document.getElementById('personnel-dest'), persDest);
             animateNumber(document.getElementById('personnel-wounded'), persWound);
         }
@@ -336,13 +269,12 @@
             const summary = {};
             allRowsData.forEach(row => {
                 const label = row.c[1]?.v; if (!label) return;
-                if (!summary[label]) summary[label] = { c: 0, d: 0, i: 0 };
+                if (!summary[label]) summary[label] = { c: 0, d: 0 };
                 summary[label].c += (parseInt(row.c[2]?.v) || 0);
                 summary[label].d += (parseInt(row.c[3]?.v) || 0);
-                summary[label].i += (parseInt(row.c[8]?.v) || 0);
             });
             const rows = Object.keys(summary).map(k => ({ 
-                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}, null, null, null, null, {v: summary[k].i}] 
+                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}, null, null, null, null] 
             }));
             display(rows, "ВСІ");
         }
