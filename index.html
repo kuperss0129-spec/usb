@@ -14,10 +14,7 @@
             --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #1a2222;
-            --dropdown-border: #2a2018; 
             --header-h: 85px; 
-            --font-main: 32px;
-            --font-nav: 18px;
         }
 
         html, body {
@@ -32,11 +29,11 @@
         .top-nav {
             display: flex; align-items: stretch; background-color: var(--bg-dark);
             height: var(--header-h); width: 100%; border-bottom: 2px solid var(--row-border);
-            padding: 0 25px; gap: 15px;
+            padding: 0 25px; gap: 15px; box-sizing: border-box;
         }
 
         .nav-logo-section { display: flex; align-items: center; gap: 15px; }
-        .main-title { font-size: var(--font-main); letter-spacing: 0.5px; white-space: nowrap; text-transform: uppercase; }
+        .main-title { font-size: 32px; text-transform: uppercase; white-space: nowrap; }
         .title-accent { color: var(--accent-main); }
 
         .nav-blocks { display: flex; align-items: center; gap: 12px; flex-grow: 1; justify-content: flex-end; }
@@ -44,68 +41,63 @@
         .info-block {
             background-color: var(--bg-block); height: 58px; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
-            padding: 0 25px; min-width: 150px; font-size: var(--font-nav);
-            border-radius: 2px; cursor: pointer; transition: background 0.2s; border: none;
-            color: var(--text-white); font-weight: 700; text-transform: uppercase;
-            position: relative;
+            padding: 0 25px; min-width: 150px; border-radius: 2px; cursor: pointer; 
+            transition: background 0.2s; color: var(--text-white); font-weight: 700; text-transform: uppercase;
         }
-
         .info-block:hover { background-color: var(--bg-hover); }
         .time-date { color: var(--accent-main); font-size: 16px; line-height: 1.2; text-align: center; }
 
         /* --- ПЛАВНИЙ DROPDOWN --- */
-        .custom-select-wrapper { position: relative; display: inline-block; }
-        .selected-option { display: flex; align-items: center; gap: 15px; }
-        .arrow { color: var(--accent-main); font-size: 10px; transition: transform 0.3s; }
-
+        .custom-select-wrapper { position: relative; }
         .dropdown-content {
             display: block; position: absolute; top: 110%; left: 0; width: 100%;
-            background-color: var(--bg-block); z-index: 100; border-radius: 2px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid var(--row-border);
-            opacity: 0; visibility: hidden; transform: translateY(-15px);
+            background-color: var(--bg-block); z-index: 100; border: 1px solid var(--row-border);
+            opacity: 0; visibility: hidden; transform: translateY(-10px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
-
         .dropdown-item {
-            padding: 15px 20px; text-align: center; transition: background 0.2s;
-            border-bottom: 1px solid var(--dropdown-border);
-            text-transform: none; color: var(--text-white); font-weight: 700;
+            padding: 15px; text-align: center; border-bottom: 1px solid #1a2222;
+            transition: color 0.2s; cursor: pointer;
         }
-        .dropdown-item:last-child { border-bottom: none; }
-        .dropdown-item:hover { background-color: var(--bg-hover); color: var(--accent-main); }
+        .dropdown-item:hover { color: var(--accent-main); background: var(--bg-hover); }
 
-        /* --- STATS CARDS --- */
-        .stat-value { 
-            font-size: 42px; font-weight: 700; display: block; margin-bottom: 4px; 
-            color: var(--accent-main); text-shadow: 0 0 10px rgba(249, 148, 23, 0.2);
-        }
-        .stat-label { color: var(--text-white); font-size: 14px; text-transform: lowercase; font-weight: 700; }
-
+        /* --- TOP STATS --- */
         .top-stats-container {
             display: flex; justify-content: center; gap: 10px; width: 100%;
-            max-width: 1350px; margin-top: 15px; padding: 0 20px;
+            max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box;
         }
         .stat-card {
             background-color: var(--bg-block); flex: 1; display: flex;
-            justify-content: center; align-items: center; padding: 25px 20px; gap: 35px; border-radius: 2px;
+            justify-content: center; align-items: center; padding: 25px 20px; gap: 35px;
         }
         .stat-item { text-align: center; position: relative; }
-        .stat-item:not(:last-child)::after {
-            content: ""; position: absolute; right: -17px; top: 20%; height: 60%; width: 1px; background-color: #222;
-        }
+        .stat-value { font-size: 42px; color: var(--accent-main); display: block; }
+        .stat-label { font-size: 14px; text-transform: lowercase; }
 
         /* --- TABLE --- */
-        .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; }
-        .stats-column { flex: 1; min-width: 320px; max-width: 650px; }
-        .table-header { display: grid; grid-template-columns: 1fr 160px; padding-bottom: 8px; border-bottom: 1px solid var(--row-border); color: var(--accent-main); font-size: 13px; text-transform: lowercase; text-align: right; }
-        .data-row { display: grid; grid-template-columns: 45px 1fr 75px 75px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
-        .check-icon { width: 18px; height: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
-        .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
-        .value-cell { text-align: center; font-size: 22px; font-weight: 700; }
+        .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; box-sizing: border-box; }
+        .stats-column { flex: 1; min-width: 350px; }
         
-        @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } .nav-blocks { justify-content: center; flex-wrap: wrap; } }
+        .table-header {
+            display: grid; grid-template-columns: 1fr 180px; 
+            padding-bottom: 8px; border-bottom: 1px solid var(--row-border);
+            color: var(--accent-main); font-size: 13px; text-transform: lowercase;
+        }
+        .header-labels { display: flex; justify-content: space-between; text-align: center; }
+        .header-labels div { width: 85px; }
+
+        .data-row { 
+            display: grid; grid-template-columns: 45px 1fr 85px 85px; 
+            align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); 
+        }
+        .check-icon { width: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
+        .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
+        
+        /* Усі цифри в таблиці завжди білі */
+        .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; }
+
+        @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -115,14 +107,11 @@
             <svg width="40" height="40" viewBox="0 0 100 100" fill="white"><path d="M50 5L15 30V70L50 95L85 70V30L50 5ZM50 15L75 32V68L50 85L25 68V32L50 15Z"/></svg>
             <div class="main-title">ЗВІТ ББпС <span class="title-accent">125 ОВМБр</span></div>
         </div>
-
         <div class="nav-blocks">
             <div class="info-block" onclick="renderAllTimeSum()"><div id="clock" class="time-date">--:--:--</div></div>
             <div class="info-block" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
             <div class="custom-select-wrapper">
-                <div class="info-block" id="dropdown-btn">
-                    <div class="selected-option"><span>МИНУЛИЙ ПЕРІОД</span><span class="arrow">▼</span></div>
-                </div>
+                <div class="info-block" id="dropdown-btn">МИНУЛИЙ ПЕРІОД ▼</div>
                 <div class="dropdown-content" id="dropdown-menu"></div>
             </div>
         </div>
@@ -140,20 +129,26 @@
         <div class="stat-card">
             <div class="stat-item"><span class="stat-value" id="personnel-hit">0</span><span class="stat-label">ОС РОВ</span></div>
             <div class="stat-item"><span class="stat-value" id="personnel-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
-            <div class="stat-item"><span class="stat-value" id="personnel-wounded">0</span><span class="stat-label">в т.ч. поранено</span></div>
+            <div class="stat-item"><span class="stat-value" id="personnel-wounded">0</span><span class="stat-label">поранено</span></div>
         </div>
     </div>
 
-    <div id="status-msg" style="text-align:center; padding:50px; color:var(--accent-main);">СИНХРОНІЗАЦІЯ ДАНИХ...</div>
+    <div id="status-msg" style="text-align:center; padding:50px; color:var(--accent-main);">СИНХРОНІЗАЦІЯ...</div>
 
     <div class="stats-wrapper" id="main-wrapper" style="display: none;">
-        <div class="stats-column"><div class="table-header"><div></div><div>уражено / знищено</div></div><div id="col-left"></div></div>
-        <div class="stats-column"><div class="table-header"><div></div><div>уражено / знищено</div></div><div id="col-right"></div></div>
+        <div class="stats-column">
+            <div class="table-header"><div></div><div class="header-labels"><div>уражено</div><div>в т.ч. знищено</div></div></div>
+            <div id="col-left"></div>
+        </div>
+        <div class="stats-column">
+            <div class="table-header"><div></div><div class="header-labels"><div>уражено</div><div>в т.ч. знищено</div></div></div>
+            <div id="col-right"></div>
+        </div>
     </div>
 
     <script>
         const monthsNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
-        let allRowsRaw = []; 
+        let allRowsRaw = [];
         const now = new Date();
         const currentMonthIdx = now.getMonth();
         const currentYear = now.getFullYear();
@@ -167,7 +162,7 @@
 
         const dropBtn = document.getElementById('dropdown-btn');
         const dropMenu = document.getElementById('dropdown-menu');
-        dropBtn.addEventListener('click', () => dropMenu.classList.toggle('show'));
+        dropBtn.onclick = () => dropMenu.classList.toggle('show');
         window.onclick = (e) => { if (!e.target.closest('.custom-select-wrapper')) dropMenu.classList.remove('show'); };
 
         function animateNumber(el, target) {
@@ -184,14 +179,12 @@
         async function fetchData() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            
             try {
-                const response = await fetch(url);
-                const text = await response.text();
-                const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+                const res = await fetch(url);
+                const txt = await res.text();
+                const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
                 allRowsRaw = json.table.rows;
 
-                // Фільтр періодів для випадаючого списку (тільки минуле/теперішнє зі стовпця A)
                 const validPeriods = [...new Set(allRowsRaw.map(r => r.c[0]?.v))].filter(p => {
                     if(!p) return false;
                     const [m, y] = p.split(' ');
@@ -199,13 +192,12 @@
                     return parseInt(y) < currentYear || (parseInt(y) === currentYear && mIdx <= currentMonthIdx);
                 });
 
-                const menuPeriods = validPeriods.filter(p => p !== currentSearchString);
-                menuPeriods.sort((a,b) => {
+                const menuItems = validPeriods.filter(p => p !== currentSearchString).sort((a,b) => {
                     const [mA, yA] = a.split(' '), [mB, yB] = b.split(' ');
                     return (yB - yA) || (monthsNames.indexOf(mB) - monthsNames.indexOf(mA));
                 });
 
-                menuPeriods.forEach(p => {
+                menuItems.forEach(p => {
                     const div = document.createElement('div');
                     div.className = 'dropdown-item'; div.textContent = p;
                     div.onclick = () => { renderData(p); dropMenu.classList.remove('show'); };
@@ -213,30 +205,25 @@
                 });
 
                 renderData(currentSearchString);
-            } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА ТАБЛИЦІ'; }
+            } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА'; }
         }
 
         function calculateTopStats(filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, pDest = 0, pWound = 0;
-
             allRowsRaw.forEach(r => {
-                // ЛОГІКА ТЕХНІКИ (Фільтр по стовпцю A)
                 if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
                     const label = r.c[1]?.v || "";
-                    const valC = parseInt(r.c[2]?.v) || 0;
-                    const valD = parseInt(r.c[3]?.v) || 0;
-                    hits += valC; dests += valD;
-                    if (label.includes("ОС РОВ")) { pDest += valD; pWound += valC; }
+                    const vC = parseInt(r.c[2]?.v) || 0;
+                    const vD = parseInt(r.c[3]?.v) || 0;
+                    hits += vC; dests += vD;
+                    if (label.includes("ОС РОВ")) { pDest += vD; pWound += vC; }
                 }
-
-                // ЛОГІКА ВИЛЬОТІВ (Фільтр по стовпцю F [index 5])
-                // Стовпець G [index 6] - Ударні, Стовпець H [index 7] - Розвідка
+                // Логіка вильотів: Місяць у F(5), Ударні у G(6), Розвідка у H(7)
                 if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
                     strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
             });
-
             animateNumber(document.getElementById('total-hit'), hits);
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
@@ -250,20 +237,18 @@
         function renderAllTimeSum() { renderData("ВСІ"); }
 
         function renderData(val) {
-            // Для таблиці фільтруємо по стовпцю A
-            const tableRows = (val === "ВСІ") ? aggregateAll() : allRowsRaw.filter(r => r.c[0]?.v === val);
+            let tableRows = allRowsRaw.filter(r => r.c[0]?.v === val);
+            if (val === "ВСІ") {
+                const sum = {};
+                allRowsRaw.forEach(r => {
+                    const lbl = r.c[1]?.v; if(!lbl) return;
+                    if(!sum[lbl]) sum[lbl] = {c:0, d:0};
+                    sum[lbl].c += (parseInt(r.c[2]?.v) || 0);
+                    sum[lbl].d += (parseInt(r.c[3]?.v) || 0);
+                });
+                tableRows = Object.keys(sum).map(k => ({ c: [null, {v: k}, {v: sum[k].c}, {v: sum[k].d}] }));
+            }
             display(tableRows, val);
-        }
-
-        function aggregateAll() {
-            const sum = {};
-            allRowsRaw.forEach(r => {
-                const lbl = r.c[1]?.v; if(!lbl) return;
-                if(!sum[lbl]) sum[lbl] = {c:0, d:0};
-                sum[lbl].c += (parseInt(r.c[2]?.v) || 0);
-                sum[lbl].d += (parseInt(r.c[3]?.v) || 0);
-            });
-            return Object.keys(sum).map(k => ({ c: [null, {v: k}, {v: sum[k].c}, {v: sum[k].d}] }));
         }
 
         function display(rows, val) {
@@ -273,14 +258,13 @@
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('main-wrapper').style.display = 'flex';
             document.getElementById('top-stats').style.display = 'flex';
-            
             const half = Math.ceil(rows.length / 2);
             rows.forEach((r, i) => {
                 const html = `<div class="data-row">
                     <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
                     <div class="label-cell">${r.c[1]?.v || '—'}</div>
-                    <div class="value-cell" style="color:#fff">${parseInt(r.c[2]?.v) || 0}</div>
-                    <div class="value-cell" style="color:#7a8a8a">${parseInt(r.c[3]?.v) || 0}</div>
+                    <div class="value-cell">${parseInt(r.c[2]?.v) || 0}</div>
+                    <div class="value-cell">${parseInt(r.c[3]?.v) || 0}</div>
                 </div>`;
                 if (i < half) colL.innerHTML += html; else colR.innerHTML += html;
             });
