@@ -193,4 +193,36 @@
                 status.style.display = 'none';
                 wrapper.style.display = 'flex';
 
-                const half =
+                const half = Math.ceil(filteredRows.length / 2);
+
+                filteredRows.forEach((row, index) => {
+                    const label = (row.c[1] && row.c[1].v) ? row.c[1].v : '—';
+                    const hit = (row.c[2] && row.c[2].v) ? row.c[2].v : '0';
+                    const dest = (row.c[3] && row.c[3].v) ? row.c[3].v : '0';
+
+                    const rowHtml = `
+                        <div class="data-row">
+                            <div class="icon-cell">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 8v8M8 12h8"></path>
+                                </svg>
+                            </div>
+                            <div class="label-cell">${label}</div>
+                            <div class="value-cell val-total">${hit}</div>
+                            <div class="value-cell val-destroyed">${dest}</div>
+                        </div>
+                    `;
+
+                    if (index < half) colLeft.innerHTML += rowHtml;
+                    else colRight.innerHTML += rowHtml;
+                });
+            } catch (e) {
+                document.getElementById('status-msg').innerText = 'ПОМИЛКА ДОСТУПУ';
+            }
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
