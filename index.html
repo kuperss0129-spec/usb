@@ -9,17 +9,19 @@
     <style>
         :root {
             --bg-dark: #020606;
-            --bg-block: rgba(13, 18, 18, 0.85);
+            --bg-block: rgba(13, 18, 18, 0.8);
             --bg-hover: rgba(22, 29, 29, 0.9);
             --accent-main: rgb(249, 148, 23); 
             --text-white: #ffffff;
-            --row-border: rgba(26, 34, 34, 0.6);
+            --row-border: rgba(26, 34, 34, 0.5);
+            /* М'ЯКИЙ НЕОН */
             --neon-glow: 0 0 8px rgba(249, 148, 23, 0.4);
             --white-glow: 0 0 6px rgba(255, 255, 255, 0.2);
         }
 
         html, body {
             max-width: 100%; overflow-x: hidden;
+            /* ВАШ НОВИЙ ГРАДІЄНТНИЙ ФОН */
             background: 
                 radial-gradient(41% 140% at -6% -20%, rgba(249, 148, 23, 0.25) 20%, rgba(0, 0, 0, 0.03) 100%), 
                 radial-gradient(38% 168% at 101% 200%, rgba(249, 148, 23, 0.25) 20%, rgba(0, 0, 0, 0.03) 100%), 
@@ -33,9 +35,10 @@
 
         /* --- NAVIGATION --- */
         .top-nav {
-            display: flex; align-items: stretch; background: rgba(2, 6, 6, 0.6);
-            backdrop-filter: blur(12px); height: 85px; width: 100%; border-bottom: 1px solid var(--row-border);
-            padding: 0 25px; gap: 15px; box-sizing: border-box;
+            display: flex; align-items: stretch; background: rgba(2, 6, 6, 0.7);
+            backdrop-filter: blur(10px);
+            height: 85px; width: 100%; border-bottom: 1px solid var(--row-border);
+            padding: 0 25px; gap: 15px; box-sizing: border-box; z-index:1;
         }
         .nav-logo-section { display: flex; align-items: center; gap: 15px; }
         .main-title { font-size: 32px; text-transform: uppercase; white-space: nowrap; }
@@ -80,12 +83,11 @@
 
         /* --- TABLE --- */
         .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; box-sizing: border-box; }
-        .stats-column { flex: 1; min-width: 380px; }
+        .stats-column { flex: 1; min-width: 380px; background: rgba(13, 18, 18, 0.4); padding: 15px; border-radius: 4px; }
         .table-header { display: grid; grid-template-columns: 1fr 190px; padding-bottom: 8px; border-bottom: 1px solid var(--row-border); color: var(--accent-main); font-size: 14px; text-transform: lowercase; }
         .header-labels { display: flex; justify-content: flex-end; gap: 10px; text-align: center; }
         .header-labels div { width: 90px; }
-        .data-row { display: grid; grid-template-columns: 45px 1fr 90px 90px; column-gap: 5px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); transition: background 0.2s; }
-        .data-row:hover { background: rgba(249, 148, 23, 0.03); }
+        .data-row { display: grid; grid-template-columns: 45px 1fr 90px 90px; column-gap: 5px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
         .check-icon { width: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; text-shadow: var(--white-glow); width: 90px; }
@@ -122,19 +124,19 @@
         <div class="stat-card">
             <div class="stat-item"><span class="stat-value" id="personnel-hit">0</span><span class="stat-label">ОС РОВ</span></div>
             <div class="stat-item"><span class="stat-value" id="personnel-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
-            <div class="stat-item"><span class="stat-value" id="personnel-wounded">0</span><span class="stat-label">поранено</span></div>
+            <div class="stat-item"><span class="stat-value" id="personnel-wounded">0</span><span class="stat-label">в т.ч. поранено</span></div>
         </div>
     </div>
 
-    <div id="status-msg" style="text-align:center; padding:50px; color:var(--accent-main);">СИНХРОНІЗАЦІЯ ДАНИХ...</div>
+    <div id="status-msg" style="text-align:center; padding:50px; color:var(--accent-main);">СИНХРОНІЗАЦІЯ...</div>
 
     <div class="stats-wrapper" id="main-wrapper" style="display: none;">
         <div class="stats-column">
-            <div class="table-header"><div></div><div class="header-labels"><div>уражено</div><div>знищено</div></div></div>
+            <div class="table-header"><div></div><div class="header-labels"><div>уражено</div><div>в т.ч. знищено</div></div></div>
             <div id="col-left"></div>
         </div>
         <div class="stats-column">
-            <div class="table-header"><div></div><div class="header-labels"><div>уражено</div><div>знищено</div></div></div>
+            <div class="table-header"><div></div><div class="header-labels"><div>уражено</div><div>в т.ч. знищено</div></div></div>
             <div id="col-right"></div>
         </div>
     </div>
@@ -146,12 +148,6 @@
         const currentMonthIdx = now.getMonth();
         const currentYear = now.getFullYear();
         const currentSearchString = `${monthsNames[currentMonthIdx]} ${currentYear}`;
-
-        // Допоміжна функція для безпечного перетворення на число
-        function cleanNumber(val) {
-            const num = parseInt(val);
-            return isNaN(num) ? 0 : num;
-        }
 
         const dropBtn = document.getElementById('dropdown-btn');
         const dropMenu = document.getElementById('dropdown-menu');
@@ -210,43 +206,31 @@
 
                 renderData(currentSearchString);
                 setActiveBtn('current-month-btn');
-            } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА ЗВ\'ЯЗКУ'; }
+            } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА'; }
         }
 
-        function calculateTopStats(filterValue) {
+       function calculateTopStats(filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, pTotalHit = 0, pDestroyed = 0;
-            
             allRowsRaw.forEach(r => {
-                if (!r || !r.c) return;
-                const rowPeriod = r.c[0]?.v;
-                const isMatch = (rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod);
-                
-                if (isMatch) {
-                    const label = (r.c[1] && r.c[1].v) ? r.c[1].v.toString() : "";
-                    const valC = cleanNumber(r.c[2]?.v);
-                    const valD = cleanNumber(r.c[3]?.v);
-                    
-                    if (label !== "") {
-                        hits += valC; dests += valD;
-                        if (label.toUpperCase().includes("ОС РОВ")) { 
-                            pTotalHit += valC; pDestroyed += valD; 
-                        }
-                    }
-
-                    const valG = cleanNumber(r.c[6]?.v);
-                    const valH = cleanNumber(r.c[7]?.v);
-                    strike += valG;
-                    recon += valH;
+                if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
+                    const label = r.c[1]?.v || "";
+                    const vC = parseInt(r.c[2]?.v) || 0;
+                    const vD = parseInt(r.c[3]?.v) || 0;
+                    hits += vC; dests += vD;
+                    if (label.includes("ОС РОВ")) { pTotalHit += vC; pDestroyed += vD; }
+                }
+                if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
+                    strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
+                    recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
             });
-
             animateNumber(document.getElementById('total-hit'), hits);
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
             animateNumber(document.getElementById('personnel-hit'), pTotalHit);
             animateNumber(document.getElementById('personnel-dest'), pDestroyed);
-            animateNumber(document.getElementById('personnel-wounded'), (pTotalHit - pDestroyed));
+            animateNumber(document.getElementById('personnel-wounded'), pTotalHit - pDestroyed);
         }
 
         function renderCurrentMonth() { renderData(currentSearchString); setActiveBtn('current-month-btn'); }
@@ -262,8 +246,8 @@
                     const lbl = (r.c[1] && r.c[1].v) ? r.c[1].v : null;
                     if(!lbl) return;
                     if(!sum[lbl]) sum[lbl] = {c:0, d:0};
-                    sum[lbl].c += cleanNumber(r.c[2]?.v);
-                    sum[lbl].d += cleanNumber(r.c[3]?.v);
+                    sum[lbl].c += (Number(r.c[2]?.v) || 0);
+                    sum[lbl].d += (Number(r.c[3]?.v) || 0);
                 });
                 tableRows = Object.keys(sum).map(k => ({ c: [null, {v: k}, {v: sum[k].c}, {v: sum[k].d}] }));
             }
@@ -278,28 +262,17 @@
             document.getElementById('main-wrapper').style.display = 'flex';
             document.getElementById('top-stats').style.display = 'flex';
             
-            // Підготовка та валідація даних
-            let preparedRows = rows.map(r => ({
-                label: r.c[1]?.v ? r.c[1].v.toString() : "—",
-                hit: cleanNumber(r.c[2]?.v),
-                dest: cleanNumber(r.c[3]?.v)
-            })).filter(r => r.label !== "—");
+            // Сортування таблиці за кількістю уражень (від більшого до меншого)
+            const sortedRows = rows.sort((a, b) => (Number(b.c[2]?.v) || 0) - (Number(a.c[2]?.v) || 0));
+            const half = Math.ceil(sortedRows.length / 2);
 
-            // Сортування: ОС РОВ завжди зверху, далі за спаданням уражень
-            preparedRows.sort((a, b) => {
-                if (a.label.toUpperCase().includes("ОС РОВ")) return -1;
-                if (b.label.toUpperCase().includes("ОС РОВ")) return 1;
-                return b.hit - a.hit;
-            });
-
-            const half = Math.ceil(preparedRows.length / 2);
-
-            preparedRows.forEach((r, i) => {
+            sortedRows.forEach((r, i) => {
+                if(!r.c[1]?.v) return;
                 const html = `<div class="data-row">
                     <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                    <div class="label-cell">${r.label}</div>
-                    <div class="value-cell">${r.hit}</div>
-                    <div class="value-cell">${r.dest}</div>
+                    <div class="label-cell">${r.c[1].v}</div>
+                    <div class="value-cell">${Number(r.c[2]?.v) || 0}</div>
+                    <div class="value-cell">${Number(r.c[3]?.v) || 0}</div>
                 </div>`;
                 if (i < half) colL.innerHTML += html; else colR.innerHTML += html;
             });
