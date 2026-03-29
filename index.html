@@ -68,35 +68,43 @@
         .info-block:hover { background-color: var(--bg-hover); }
         .time-date { color: #ffffff; font-size: 17px; line-height: 1.2; text-align: center; pointer-events: none; }
 
-        /* --- DROPDOWN --- */
-        .dropdown-wrapper { position: relative; padding: 0 !important; overflow: hidden; }
-        .dropdown-wrapper select {
-            background: var(--bg-block);
-            border: none;
-            color: white;
-            font-family: inherit;
-            font-size: var(--font-blocks);
-            font-weight: 700;
-            appearance: none;
-            cursor: pointer;
-            padding: 0 50px 0 30px;
+        /* --- TOP STATS BLOCK --- */
+        .top-stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             width: 100%;
-            height: 100%;
-            outline: none;
-        }
-        .dropdown-wrapper select:hover { background-color: var(--bg-hover); }
-        .dropdown-wrapper::after {
-            content: "▼";
-            font-size: 11px;
-            color: #666;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
+            max-width: 1300px;
+            margin-top: 15px;
+            padding: 0 20px;
         }
 
-        /* --- ТАБЛИЦЯ --- */
+        .stat-card {
+            background-color: var(--bg-block);
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 30px;
+            border-radius: 2px;
+        }
+
+        .stat-item { text-align: center; position: relative; }
+        .stat-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: -15px;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background-color: #222;
+        }
+
+        .stat-value { font-size: 36px; font-weight: 700; display: block; margin-bottom: 5px; }
+        .stat-label { color: var(--accent-cyan); font-size: 14px; text-transform: lowercase; }
+
+        /* --- TABLE --- */
         .stats-wrapper {
             display: flex;
             flex-wrap: wrap;
@@ -104,12 +112,11 @@
             justify-content: center;
             max-width: 1300px;
             width: 100%;
-            margin: 40px auto;
+            margin: 30px auto;
             padding: 0 20px;
         }
 
         .stats-column { flex: 1; min-width: 320px; max-width: 620px; }
-
         .table-header {
             display: grid;
             grid-template-columns: 1fr 160px;
@@ -129,35 +136,24 @@
             border-bottom: 1px solid var(--row-border);
         }
 
-        /* Оновлена іконка-галочка */
-        .icon-cell { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-        }
-        
-        .check-icon {
-            width: 18px;
-            height: 18px;
-            stroke: var(--accent-cyan);
-            stroke-width: 3;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 2px rgba(0, 242, 255, 0.3));
-        }
-
+        .check-icon { width: 18px; height: 18px; stroke: var(--accent-cyan); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; }
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; }
         .val-total { color: #fff; }
         .val-destroyed { color: #7a8a8a; }
 
+        .dropdown-wrapper select {
+            background: var(--bg-block); border: none; color: white; font-family: inherit;
+            font-size: var(--font-blocks); font-weight: 700; appearance: none; cursor: pointer;
+            padding: 0 50px 0 30px; width: 100%; height: 100%; outline: none;
+        }
+
         #status-msg { text-align: center; padding: 60px; color: var(--accent-cyan); text-transform: uppercase; font-size: 18px; }
 
         @media (max-width: 1000px) {
             .top-nav { height: auto; flex-direction: column; padding: 20px; gap: 15px; }
+            .top-stats-container { flex-direction: column; }
             .nav-blocks { width: 100%; justify-content: center; }
-            .info-block { flex: 1; }
         }
     </style>
 </head>
@@ -175,18 +171,30 @@
             <div class="info-block" onclick="renderAllTimeSum()" title="За весь час">
                 <div id="clock" class="time-date">--:--:-- --<br>--.--.----</div>
             </div>
-            
-            <div class="info-block" onclick="renderCurrentMonth()">
-                <span id="month-label">Березень</span>
-            </div>
-
-            <div class="info-block dropdown-wrapper">
-                <select id="period-select" onchange="renderData(this.value)">
+            <div class="info-block" onclick="renderCurrentMonth()"><span id="month-label">Березень</span></div>
+            <div class="info-block" style="position:relative; padding:0; overflow:hidden;">
+                <select id="period-select" onchange="renderData(this.value)" style="background:transparent; border:none; color:white; font-family:inherit; font-size:22px; font-weight:700; cursor:pointer; padding:0 40px; height:100%; outline:none;">
                     <option value="" disabled selected>Минулий період</option>
                 </select>
             </div>
         </div>
     </nav>
+
+    <div class="top-stats-container" id="top-stats" style="display: none;">
+        <div class="stat-card">
+            <div class="stat-item"><span class="stat-value" id="total-hit">0</span><span class="stat-label">уражено цілей</span></div>
+            <div class="stat-item"><span class="stat-value" id="total-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-item"><span class="stat-value" id="strike-sorties">0</span><span class="stat-label">ударних вильотів</span></div>
+            <div class="stat-item"><span class="stat-value" id="recon-sorties">0</span><span class="stat-label">розвід. вильотів</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-item"><span class="stat-value" id="personnel-hit">0</span><span class="stat-label">ОС РОВ</span></div>
+            <div class="stat-item"><span class="stat-value" id="personnel-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
+            <div class="stat-item"><span class="stat-value" id="personnel-wounded">0</span><span class="stat-label">в т.ч. поранено</span></div>
+        </div>
+    </div>
 
     <div id="status-msg">СИНХРОНІЗАЦІЯ...</div>
 
@@ -205,25 +213,18 @@
         const monthsNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
         let allRowsData = [];
         const now = new Date();
-        const currentMonthIdx = now.getMonth();
-        const currentYear = now.getFullYear();
-        const currentSearchString = `${monthsNames[currentMonthIdx]} ${currentYear}`;
+        const currentSearchString = `${monthsNames[now.getMonth()]} ${now.getFullYear()}`;
 
         function updateClock() {
-            const d = new Date();
-            const days = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
-            document.getElementById('clock').innerHTML = 
-                `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')} ${days[d.getDay()]}<br>` +
-                `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
+            const d = new Date(); const days = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
+            document.getElementById('clock').innerHTML = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')} ${days[d.getDay()]}<br>${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`;
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
         async function fetchData() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            document.getElementById('month-label').textContent = monthsNames[currentMonthIdx];
-
+            
             try {
                 const response = await fetch(url);
                 const text = await response.text();
@@ -231,59 +232,68 @@
                 allRowsData = json.table.rows;
 
                 const select = document.getElementById('period-select');
-                const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => {
-                    if (!p) return false;
-                    const parts = p.split(' ');
-                    const mIdx = monthsNames.indexOf(parts[0]);
-                    const yNum = parseInt(parts[1]);
-                    const isFuture = yNum > currentYear || (yNum === currentYear && mIdx > currentMonthIdx);
-                    return !isFuture && p !== currentSearchString;
-                });
-
-                periods.sort((a, b) => {
-                    const pA = a.split(' '); const pB = b.split(' ');
-                    return (parseInt(pB[1]) - parseInt(pA[1])) || (monthsNames.indexOf(pB[0]) - monthsNames.indexOf(pA[0]));
-                });
-
+                const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => p && p !== currentSearchString);
                 periods.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p; opt.textContent = p;
-                    select.appendChild(opt);
+                    const opt = document.createElement('option'); opt.value = p; opt.textContent = p; select.appendChild(opt);
                 });
 
                 renderCurrentMonth();
-            } catch (e) {
-                document.getElementById('status-msg').innerText = 'ПОМИЛКА ТАБЛИЦІ';
-            }
+            } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА ТАБЛИЦІ'; }
         }
 
-        function renderCurrentMonth() {
-            renderData(currentSearchString);
-            document.getElementById('period-select').selectedIndex = 0;
+        function calculateTopStats(rows) {
+            let hits = 0, dests = 0, strike = 0, recon = 0, persHit = 0, persDest = 0, persWound = 0;
+
+            rows.forEach(row => {
+                const label = row.c[1]?.v || "";
+                
+                // Згідно з твоїм описом:
+                // Уражено цілей - Код С (індекс 2), Знищено - Код D (індекс 3)
+                // Ударні вильоти - Код G (індекс 6), Розвід. вильоти - Код H (індекс 7)
+                const cVal = parseInt(row.c[2]?.v) || 0; // Col C
+                const dVal = parseInt(row.c[3]?.v) || 0; // Col D
+                const gVal = parseInt(row.c[6]?.v) || 0; // Col G
+                const hVal = parseInt(row.c[7]?.v) || 0; // Col H
+                const iVal = parseInt(row.c[8]?.v) || 0; // Col I (можливо для поранених)
+
+                if (label.includes("ОС РОВ")) {
+                    persHit += cVal; // уражено
+                    persDest += dVal; // знищено
+                    persWound += iVal; // поранено (з припущенням на Col I)
+                } else {
+                    hits += cVal;
+                    dests += dVal;
+                    strike += gVal;
+                    recon += hVal;
+                }
+            });
+
+            document.getElementById('total-hit').textContent = hits;
+            document.getElementById('total-dest').textContent = dests;
+            document.getElementById('strike-sorties').textContent = strike;
+            document.getElementById('recon-sorties').textContent = recon;
+            document.getElementById('personnel-hit').textContent = persHit;
+            document.getElementById('personnel-dest').textContent = persDest;
+            document.getElementById('personnel-wounded').textContent = persWound;
         }
+
+        function renderCurrentMonth() { renderData(currentSearchString); }
 
         function renderAllTimeSum() {
             const summary = {};
             allRowsData.forEach(row => {
-                const p = row.c[0]?.v;
-                if (!p) return;
-                const parts = p.split(' ');
-                const mIdx = monthsNames.indexOf(parts[0]);
-                const yNum = parseInt(parts[1]);
-                if (yNum > currentYear || (yNum === currentYear && mIdx > currentMonthIdx)) return;
-
-                const label = row.c[1]?.v;
-                if (!label) return;
-                if (!summary[label]) summary[label] = { hit: 0, dest: 0 };
-                summary[label].hit += (parseInt(row.c[2]?.v) || 0);
-                summary[label].dest += (parseInt(row.c[3]?.v) || 0);
+                const label = row.c[1]?.v; if (!label) return;
+                if (!summary[label]) summary[label] = { c: 0, d: 0, g: 0, h: 0, i: 0 };
+                summary[label].c += (parseInt(row.c[2]?.v) || 0);
+                summary[label].d += (parseInt(row.c[3]?.v) || 0);
+                summary[label].g += (parseInt(row.c[6]?.v) || 0);
+                summary[label].h += (parseInt(row.c[7]?.v) || 0);
+                summary[label].i += (parseInt(row.c[8]?.v) || 0);
             });
-
-            const formattedRows = Object.keys(summary).map(key => ({
-                c: [null, {v: key}, {v: summary[key].hit}, {v: summary[key].dest}]
+            const rows = Object.keys(summary).map(k => ({ 
+                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}, null, null, {v: summary[k].g}, {v: summary[k].h}, {v: summary[k].i}] 
             }));
-
-            display(formattedRows, "ЗАГАЛЬНИЙ ЗВІТ");
+            display(rows, "ЗАГАЛЬНИЙ ЗВІТ");
         }
 
         function renderData(filterValue) {
@@ -292,36 +302,25 @@
         }
 
         function display(rows, title) {
+            calculateTopStats(rows);
             const colLeft = document.getElementById('col-left');
             const colRight = document.getElementById('col-right');
-            const status = document.getElementById('status-msg');
-            const wrapper = document.getElementById('main-wrapper');
-
             colLeft.innerHTML = ''; colRight.innerHTML = '';
 
             if (rows.length === 0) {
-                status.style.display = 'block';
-                status.innerText = `НЕМАЄ ДАНИХ ЗА ${title}`;
-                wrapper.style.display = 'none';
+                document.getElementById('status-msg').style.display = 'block';
+                document.getElementById('main-wrapper').style.display = 'none';
+                document.getElementById('top-stats').style.display = 'none';
                 return;
             }
 
-            status.style.display = 'none';
-            wrapper.style.display = 'flex';
+            document.getElementById('status-msg').style.display = 'none';
+            document.getElementById('main-wrapper').style.display = 'flex';
+            document.getElementById('top-stats').style.display = 'flex';
 
             const half = Math.ceil(rows.length / 2);
             rows.forEach((row, index) => {
-                const html = `
-                    <div class="data-row">
-                        <div class="icon-cell">
-                            <svg class="check-icon" viewBox="0 0 24 24">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </div>
-                        <div class="label-cell">${row.c[1]?.v || '—'}</div>
-                        <div class="value-cell val-total">${row.c[2]?.v || '0'}</div>
-                        <div class="value-cell val-destroyed">${row.c[3]?.v || '0'}</div>
-                    </div>`;
+                const html = `<div class="data-row"><div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="label-cell">${row.c[1]?.v || '—'}</div><div class="value-cell val-total">${row.c[2]?.v || '0'}</div><div class="value-cell val-destroyed">${row.c[3]?.v || '0'}</div></div>`;
                 if (index < half) colLeft.innerHTML += html; else colRight.innerHTML += html;
             });
         }
