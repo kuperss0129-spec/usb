@@ -14,6 +14,9 @@
             --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #1a2222;
+            /* Ефект неону */
+            --neon-glow: 0 0 10px rgba(249, 148, 23, 0.5), 0 0 20px rgba(249, 148, 23, 0.2);
+            --white-glow: 0 0 8px rgba(255, 255, 255, 0.3);
         }
 
         html, body {
@@ -41,10 +44,20 @@
             background-color: var(--bg-block); height: 58px; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
             padding: 0 25px; min-width: 160px; border-radius: 2px; cursor: pointer; 
-            transition: background 0.2s; color: var(--text-white); font-weight: 700; 
-            text-transform: uppercase; text-align: center;
+            transition: all 0.3s ease; color: var(--text-white); font-weight: 700; 
+            text-transform: uppercase; text-align: center; line-height: 1.2; font-size: 16px;
+            border: 1px solid transparent;
         }
-        .info-block:hover { background-color: var(--bg-hover); }
+
+        .info-block:hover { background-color: var(--bg-hover); color: var(--accent-main); }
+
+        /* Стиль для активної кнопки */
+        .info-block.active {
+            color: var(--accent-main);
+            border: 1px solid rgba(249, 148, 23, 0.3);
+            background-color: var(--bg-hover);
+            box-shadow: inset 0 0 15px rgba(249, 148, 23, 0.1);
+        }
 
         /* --- DROPDOWN --- */
         .custom-select-wrapper { position: relative; }
@@ -66,42 +79,40 @@
             display: flex; justify-content: center; gap: 10px; width: 100%;
             max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box;
         }
-        .stat-card {
-            background-color: var(--bg-block); flex: 1; display: flex;
-            justify-content: center; align-items: center; padding: 25px 20px; gap: 35px;
-        }
+        .stat-card { background-color: var(--bg-block); flex: 1; display: flex; justify-content: center; align-items: center; padding: 25px 20px; gap: 35px; }
         .stat-item { text-align: center; position: relative; }
-        .stat-value { font-size: 42px; color: var(--accent-main); display: block; font-weight: 700; }
         
-        .stat-label { 
-            font-size: 16px; 
-            text-transform: uppercase; 
-            color: var(--text-white);
-            font-weight: 700;
-            display: block;
-            margin-top: 5px;
-            letter-spacing: 0.5px;
+        /* НЕОН ДЛЯ ВЕЛИКИХ ЦИФР */
+        .stat-value { 
+            font-size: 42px; 
+            color: var(--accent-main); 
+            display: block; 
+            font-weight: 700; 
+            text-shadow: var(--neon-glow);
         }
+        
+        .stat-label { font-size: 16px; text-transform: uppercase; color: var(--text-white); font-weight: 700; display: block; margin-top: 5px; letter-spacing: 0.5px; }
 
         /* --- TABLE --- */
         .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; box-sizing: border-box; }
         .stats-column { flex: 1; min-width: 350px; }
         
-        .table-header {
-            display: grid; grid-template-columns: 1fr 180px; 
-            padding-bottom: 8px; border-bottom: 1px solid var(--row-border);
-            color: var(--accent-main); font-size: 14px; text-transform: lowercase;
-        }
+        .table-header { display: grid; grid-template-columns: 1fr 180px; padding-bottom: 8px; border-bottom: 1px solid var(--row-border); color: var(--accent-main); font-size: 14px; text-transform: lowercase; }
         .header-labels { display: flex; justify-content: space-between; text-align: center; }
         .header-labels div { width: 85px; }
 
-        .data-row { 
-            display: grid; grid-template-columns: 45px 1fr 85px 85px; 
-            align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); 
-        }
+        .data-row { display: grid; grid-template-columns: 45px 1fr 85px 85px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
         .check-icon { width: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
-        .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; }
+        
+        /* НЕОН ДЛЯ ЦИФР У ТАБЛИЦІ */
+        .value-cell { 
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: 700; 
+            color: #ffffff; 
+            text-shadow: var(--white-glow);
+        }
 
         @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } .nav-blocks { justify-content: center; margin-top: 10px; } }
     </style>
@@ -114,8 +125,10 @@
             <div class="main-title">ЗВІТ ББпС <span class="title-accent">125 ОВМБр</span></div>
         </div>
         <div class="nav-blocks">
-            <div class="info-block" onclick="renderAllTimeSum()">ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)</div>
-            <div class="info-block" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
+            <div class="info-block" id="all-time-btn" onclick="renderAllTimeSum()">
+                ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)
+            </div>
+            <div class="info-block active" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
             <div class="custom-select-wrapper">
                 <div class="info-block" id="dropdown-btn">МИНУЛИЙ ПЕРІОД ▼</div>
                 <div class="dropdown-content" id="dropdown-menu"></div>
@@ -162,8 +175,15 @@
 
         const dropBtn = document.getElementById('dropdown-btn');
         const dropMenu = document.getElementById('dropdown-menu');
+        
         dropBtn.onclick = () => dropMenu.classList.toggle('show');
         window.onclick = (e) => { if (!e.target.closest('.custom-select-wrapper')) dropMenu.classList.remove('show'); };
+
+        function setActiveBtn(elId) {
+            document.querySelectorAll('.info-block').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById(elId);
+            if(target) target.classList.add('active');
+        }
 
         function animateNumber(el, target) {
             let start = 0; const duration = 800; const startTime = performance.now();
@@ -200,11 +220,12 @@
                 menuItems.forEach(p => {
                     const div = document.createElement('div');
                     div.className = 'dropdown-item'; div.textContent = p;
-                    div.onclick = () => { renderData(p); dropMenu.classList.remove('show'); };
+                    div.onclick = () => { renderData(p); setActiveBtn('dropdown-btn'); dropMenu.classList.remove('show'); };
                     dropMenu.appendChild(div);
                 });
 
                 renderData(currentSearchString);
+                setActiveBtn('current-month-btn');
             } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА'; }
         }
 
@@ -213,21 +234,13 @@
             let pTotalHit = 0, pDestroyed = 0;
 
             allRowsRaw.forEach(r => {
-                // ТЕХНІКА ТА ОС (Фільтр по стовпцю A - індекс 0)
                 if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
                     const label = r.c[1]?.v || "";
-                    const vC = parseInt(r.c[2]?.v) || 0; // Уражено
-                    const vD = parseInt(r.c[3]?.v) || 0; // Знищено
-                    
-                    hits += vC; 
-                    dests += vD;
-
-                    if (label.includes("ОС РОВ")) { 
-                        pTotalHit += vC;     // Всі уражені за період
-                        pDestroyed += vD;    // Тільки знищені за період
-                    }
+                    const vC = parseInt(r.c[2]?.v) || 0;
+                    const vD = parseInt(r.c[3]?.v) || 0;
+                    hits += vC; dests += vD;
+                    if (label.includes("ОС РОВ")) { pTotalHit += vC; pDestroyed += vD; }
                 }
-                // ВИЛЬОТИ (Фільтр по стовпцю F - індекс 5, G - ударні, H - розвідка)
                 if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
                     strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
@@ -238,18 +251,13 @@
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
-
-            // ЛОГІКА ОС РОВ:
-            // "ОС РОВ" = загальна кількість уражених за період
             animateNumber(document.getElementById('personnel-hit'), pTotalHit);
-            // "в т.ч. знищено" = тільки знищені за період
             animateNumber(document.getElementById('personnel-dest'), pDestroyed);
-            // "поранено" = уражені мінус знищені
             animateNumber(document.getElementById('personnel-wounded'), pTotalHit - pDestroyed);
         }
 
-        function renderCurrentMonth() { renderData(currentSearchString); }
-        function renderAllTimeSum() { renderData("ВСІ"); }
+        function renderCurrentMonth() { renderData(currentSearchString); setActiveBtn('current-month-btn'); }
+        function renderAllTimeSum() { renderData("ВСІ"); setActiveBtn('all-time-btn'); }
 
         function renderData(val) {
             let tableRows = allRowsRaw.filter(r => r.c[0]?.v === val);
