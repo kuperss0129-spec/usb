@@ -15,15 +15,26 @@
             --text-gray: #7a8a8a;
         }
 
-        body {
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden; /* ПРИБИРАЄМО ГОРИЗОНТАЛЬНУ ПРОКРУТКУ */
             background-color: var(--bg-dark);
             color: var(--text-white);
             font-family: 'Roboto Condensed', sans-serif;
             margin: 0;
             padding: 0;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Універсальне правило для правильних розмірів */
+        * {
+            box-sizing: border-box;
         }
 
         header {
@@ -54,12 +65,11 @@
             max-width: 1200px;
             width: 100%;
             padding: 40px 20px;
-            box-sizing: border-box;
         }
 
         .stats-column {
             flex: 1;
-            min-width: 320px;
+            min-width: 300px; /* Трохи зменшив, щоб влізало на мобільні */
             max-width: 550px;
         }
 
@@ -112,6 +122,11 @@
             text-align: center;
             font-size: 14px;
         }
+
+        @media (max-width: 768px) {
+            .stats-wrapper { gap: 20px; padding: 20px 10px; }
+            .stats-column { min-width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -145,25 +160,25 @@
                 "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
                 "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
             ];
-            const currentMonth = monthsNames[new Date().getMonth()];
-            console.log("Шукаємо місяць:", currentMonth);
+            
+            const now = new Date();
+            const currentMonth = monthsNames[now.getMonth()];
+            const currentYear = now.getFullYear();
+            const searchString = `${currentMonth} ${currentYear}`;
 
             try {
                 const response = await fetch(url);
                 const text = await response.text();
-                // Очищаємо JSON від зайвого тексту Google
                 const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
                 const json = JSON.parse(jsonString);
                 const allRows = json.table.rows;
 
-                // Фільтрація з перевіркою на порожні значення
+                // Фільтр: шукаємо збіг у колонці А (наприклад, "Березень 2026")
                 const filteredRows = allRows.filter(row => {
                     if (!row.c || !row.c[0]) return false;
-                    const cellValue = row.c[0].v ? row.c[0].v.toString().trim() : "";
-                    return cellValue.toLowerCase() === currentMonth.toLowerCase();
+                    const v = row.c[0].v ? row.c[0].v.toString().trim() : "";
+                    return v.toLowerCase() === searchString.toLowerCase();
                 });
-
-                console.log("Знайдено рядків:", filteredRows.length);
 
                 const colLeft = document.getElementById('col-left');
                 const colRight = document.getElementById('col-right');
@@ -171,44 +186,11 @@
                 const wrapper = document.getElementById('main-wrapper');
 
                 if (filteredRows.length === 0) {
-                    status.innerHTML = `НЕМАЄ ДАНИХ ЗА ${currentMonth.toUpperCase()}<br><small>Перевірте колонку A в таблиці</small>`;
+                    status.innerHTML = `НЕМАЄ ДАНИХ ЗА ${searchString.toUpperCase()}<br><small>Перевірте колонку A (має бути "${searchString}")</small>`;
                     return;
                 }
 
                 status.style.display = 'none';
                 wrapper.style.display = 'flex';
 
-                const half = Math.ceil(filteredRows.length / 2);
-
-                filteredRows.forEach((row, index) => {
-                    const label = (row.c[1] && row.c[1].v) ? row.c[1].v : '—';
-                    const hit = (row.c[2] && row.c[2].v) ? row.c[2].v : '0';
-                    const dest = (row.c[3] && row.c[3].v) ? row.c[3].v : '0';
-
-                    const rowHtml = `
-                        <div class="data-row">
-                            <div class="icon-cell">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M12 8v8M8 12h8"></path>
-                                </svg>
-                            </div>
-                            <div class="label-cell">${label}</div>
-                            <div class="value-cell val-total">${hit}</div>
-                            <div class="value-cell val-destroyed">${dest}</div>
-                        </div>
-                    `;
-
-                    if (index < half) colLeft.innerHTML += rowHtml;
-                    else colRight.innerHTML += rowHtml;
-                });
-            } catch (e) {
-                console.error("Помилка завантаження:", e);
-                document.getElementById('status-msg').innerText = 'ПОМИЛКА ДОСТУПУ (ПЕРЕВІРТЕ ШЕРІНГ ТАБЛИЦІ)';
-            }
-        }
-
-        window.onload = fetchData;
-    </script>
-</body>
-</html>
+                const half =
