@@ -26,7 +26,6 @@
             align-items: center;
         }
 
-        /* --- ВЕЛИКИЙ ЗАГОЛОВОК --- */
         header {
             width: 100%;
             padding: 30px 20px;
@@ -47,7 +46,6 @@
         .title-white { color: var(--text-white); }
         .title-cyan { color: var(--accent-cyan); display: block; font-size: 0.8em; }
 
-        /* --- КОНТЕЙНЕР СТАТИСТИКИ --- */
         .stats-wrapper {
             display: flex;
             flex-wrap: wrap;
@@ -95,7 +93,6 @@
             font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .value-cell {
@@ -111,13 +108,9 @@
             padding: 60px;
             color: var(--accent-cyan);
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .stats-wrapper { flex-direction: column; align-items: center; }
-            .stats-column { width: 100%; }
+            font-size: 14px;
         }
     </style>
 </head>
@@ -130,7 +123,7 @@
         </h1>
     </header>
 
-    <div id="status-msg">СИНХРОНІЗАЦІЯ ДАНИХ...</div>
+    <div id="status-msg">СИНХРОНІЗАЦІЯ...</div>
 
     <div class="stats-wrapper" id="main-wrapper" style="display: none;">
         <div class="stats-column">
@@ -148,23 +141,29 @@
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-            // Визначаємо поточний місяць українською (має співпадати з текстом у колонці А)
             const monthsNames = [
                 "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
                 "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
             ];
             const currentMonth = monthsNames[new Date().getMonth()];
+            console.log("Шукаємо місяць:", currentMonth);
 
             try {
                 const response = await fetch(url);
                 const text = await response.text();
-                const json = JSON.parse(text.substring(47).slice(0, -2));
+                // Очищаємо JSON від зайвого тексту Google
+                const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+                const json = JSON.parse(jsonString);
                 const allRows = json.table.rows;
-                
-                // ФІЛЬТРАЦІЯ: залишаємо лише ті рядки, де колонка А (c[0]) == поточний місяць
+
+                // Фільтрація з перевіркою на порожні значення
                 const filteredRows = allRows.filter(row => {
-                    return row.c[0] && row.c[0].v === currentMonth;
+                    if (!row.c || !row.c[0]) return false;
+                    const cellValue = row.c[0].v ? row.c[0].v.toString().trim() : "";
+                    return cellValue.toLowerCase() === currentMonth.toLowerCase();
                 });
+
+                console.log("Знайдено рядків:", filteredRows.length);
 
                 const colLeft = document.getElementById('col-left');
                 const colRight = document.getElementById('col-right');
@@ -172,7 +171,7 @@
                 const wrapper = document.getElementById('main-wrapper');
 
                 if (filteredRows.length === 0) {
-                    status.innerText = `НЕМАЄ ДАНИХ ЗА ${currentMonth.toUpperCase()}`;
+                    status.innerHTML = `НЕМАЄ ДАНИХ ЗА ${currentMonth.toUpperCase()}<br><small>Перевірте колонку A в таблиці</small>`;
                     return;
                 }
 
@@ -182,9 +181,9 @@
                 const half = Math.ceil(filteredRows.length / 2);
 
                 filteredRows.forEach((row, index) => {
-                    const label     = row.c[1] ? row.c[1].v : '—'; // Колонка B
-                    const hit       = row.c[2] ? row.c[2].v : '0'; // Колонка C
-                    const destroyed = row.c[3] ? row.c[3].v : '0'; // Колонка D
+                    const label = (row.c[1] && row.c[1].v) ? row.c[1].v : '—';
+                    const hit = (row.c[2] && row.c[2].v) ? row.c[2].v : '0';
+                    const dest = (row.c[3] && row.c[3].v) ? row.c[3].v : '0';
 
                     const rowHtml = `
                         <div class="data-row">
@@ -196,7 +195,7 @@
                             </div>
                             <div class="label-cell">${label}</div>
                             <div class="value-cell val-total">${hit}</div>
-                            <div class="value-cell val-destroyed">${destroyed}</div>
+                            <div class="value-cell val-destroyed">${dest}</div>
                         </div>
                     `;
 
@@ -204,7 +203,8 @@
                     else colRight.innerHTML += rowHtml;
                 });
             } catch (e) {
-                document.getElementById('status-msg').innerText = 'ПОМИЛКА ДОСТУПУ ДО ТАБЛИЦІ';
+                console.error("Помилка завантаження:", e);
+                document.getElementById('status-msg').innerText = 'ПОМИЛКА ДОСТУПУ (ПЕРЕВІРТЕ ШЕРІНГ ТАБЛИЦІ)';
             }
         }
 
