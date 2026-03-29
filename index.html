@@ -209,14 +209,15 @@
             } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА'; }
         }
 
-        function calculateTopStats(filterValue) {
+       function calculateTopStats(filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, pTotalHit = 0, pDestroyed = 0;
+            
             allRowsRaw.forEach(r => {
                 const rowPeriod = r.c[0]?.v;
                 const isMatch = (rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod);
                 
                 if (isMatch) {
-                    // ТЕХНІКА ТА ОС (Колонки C, D)
+                    // 1. Рахуємо техніку та ОС (стовпці B, C, D)
                     const label = r.c[1]?.v || "";
                     const vC = parseInt(r.c[2]?.v) || 0;
                     const vD = parseInt(r.c[3]?.v) || 0;
@@ -229,12 +230,18 @@
                             pDestroyed += vD; 
                         }
                     }
-
-                    // ВИЛЬОТИ (Колонки G, H)
-                    strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
-                    recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
+        
+                    // 2. Рахуємо вильоти (стовпці G та H)
+                    // Використовуємо r.c[6] для G та r.c[7] для H
+                    const valG = (r.c[6] && r.c[6].v !== null) ? parseInt(r.c[6].v) : 0;
+                    const valH = (r.c[7] && r.c[7].v !== null) ? parseInt(r.c[7].v) : 0;
+                    
+                    strike += valG;
+                    recon += valH;
                 }
             });
+        
+            // Анімація оновлення цифр
             animateNumber(document.getElementById('total-hit'), hits);
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
