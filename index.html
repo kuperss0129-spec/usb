@@ -14,9 +14,9 @@
             --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #1a2222;
-            /* М'ЯКШИЙ НЕОН */
-            --neon-glow: 0 0 8px rgba(249, 148, 23, 0.35);
-            --white-glow: 0 0 6px rgba(255, 255, 255, 0.2);
+            /* М'ЯКИЙ НЕОН (Зменшена інтенсивність) */
+            --neon-glow: 0 0 7px rgba(249, 148, 23, 0.4);
+            --white-glow: 0 0 5px rgba(255, 255, 255, 0.2);
         }
 
         html, body {
@@ -60,18 +60,19 @@
         .dropdown-item { padding: 15px; text-align: center; border-bottom: 1px solid #1a2222; transition: color 0.2s; cursor: pointer; font-size: 14px; }
         .dropdown-item:hover { color: var(--accent-main); background: var(--bg-hover); }
 
-        /* --- TOP STATS & ANIMATIONS --- */
+        /* --- TOP STATS & NEON --- */
         @keyframes neon-pulse {
-            0% { text-shadow: 0 0 8px rgba(249, 148, 23, 0.3); }
-            50% { text-shadow: 0 0 12px rgba(249, 148, 23, 0.5); }
-            100% { text-shadow: 0 0 8px rgba(249, 148, 23, 0.3); }
+            0% { text-shadow: 0 0 6px rgba(249, 148, 23, 0.3); }
+            50% { text-shadow: 0 0 10px rgba(249, 148, 23, 0.5); }
+            100% { text-shadow: 0 0 6px rgba(249, 148, 23, 0.3); }
         }
 
         .top-stats-container { display: flex; justify-content: center; gap: 10px; width: 100%; max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box; }
         .stat-card { background-color: var(--bg-block); flex: 1; display: flex; justify-content: center; align-items: center; padding: 25px 20px; gap: 35px; }
         .stat-item { text-align: center; position: relative; }
-        .stat-value { font-size: 42px; color: var(--accent-main); display: block; font-weight: 700; text-shadow: var(--neon-glow); }
         
+        /* Повернення неону */
+        .stat-value { font-size: 42px; color: var(--accent-main); display: block; font-weight: 700; text-shadow: var(--neon-glow); }
         #personnel-hit { animation: neon-pulse 3s infinite ease-in-out; }
 
         .stat-label { font-size: 16px; text-transform: uppercase; color: var(--text-white); font-weight: 700; display: block; margin-top: 5px; letter-spacing: 0.5px; }
@@ -85,6 +86,8 @@
         .data-row { display: grid; grid-template-columns: 45px 1fr 90px 90px; column-gap: 5px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--row-border); }
         .check-icon { width: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
+        
+        /* Повернення неону в таблицю */
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; text-shadow: var(--white-glow); width: 90px; }
 
         @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } .nav-blocks { justify-content: center; margin-top: 10px; } }
@@ -156,7 +159,6 @@
             if(target) target.classList.add('active');
         }
 
-        // Перевірка, чи належить період до минулого або поточного часу
         function isPastOrCurrent(periodStr) {
             if (!periodStr) return false;
             const parts = periodStr.split(' ');
@@ -211,16 +213,24 @@
             let hits = 0, dests = 0, strike = 0, recon = 0, pTotalHit = 0, pDestroyed = 0;
             allRowsRaw.forEach(r => {
                 const rowPeriod = r.c[0]?.v;
-                // Критична перевірка: чи відповідає рядок фільтру І чи він не з майбутнього
-                if ((rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod)) {
+                const isMatch = (rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod);
+                
+                if (isMatch) {
+                    // ТЕХНІКА ТА ОС (Колонки C, D)
                     const label = r.c[1]?.v || "";
                     const vC = parseInt(r.c[2]?.v) || 0;
                     const vD = parseInt(r.c[3]?.v) || 0;
-                    hits += vC; dests += vD;
-                    if (label.includes("ОС РОВ")) { pTotalHit += vC; pDestroyed += vD; }
-                }
-                // Вильоти рахуємо окремо за тими ж правилами
-                if ((rowPeriod === filterValue || filterValue === "ВСІ") && isPastOrCurrent(rowPeriod)) {
+                    
+                    if (label) {
+                        hits += vC; 
+                        dests += vD;
+                        if (label.includes("ОС РОВ")) { 
+                            pTotalHit += vC; 
+                            pDestroyed += vD; 
+                        }
+                    }
+
+                    // ВИЛЬОТИ (Колонки G, H)
                     strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
@@ -243,7 +253,7 @@
                 const sum = {};
                 allRowsRaw.forEach(r => {
                     const rowPeriod = r.c[0]?.v;
-                    if (!isPastOrCurrent(rowPeriod)) return; // Ігноруємо майбутні місяці
+                    if (!isPastOrCurrent(rowPeriod)) return;
                     const lbl = r.c[1]?.v; if(!lbl) return;
                     if(!sum[lbl]) sum[lbl] = {c:0, d:0};
                     sum[lbl].c += (parseInt(r.c[2]?.v) || 0);
