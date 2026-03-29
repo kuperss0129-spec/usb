@@ -14,7 +14,6 @@
             --accent-cyan: #00f2ff;
             --text-white: #ffffff;
             --row-border: #0a1111;
-            /* Збільшено ще на 10% */
             --header-h: 85px; 
             --font-main: 34px;
             --font-blocks: 22px;
@@ -53,7 +52,7 @@
 
         .info-block {
             background-color: var(--bg-block);
-            height: 62px; /* +10% */
+            height: 62px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -67,13 +66,10 @@
         }
 
         .info-block:hover { background-color: var(--bg-hover); }
-
-        /* Білий годинник */
         .time-date { color: #ffffff; font-size: 17px; line-height: 1.2; text-align: center; pointer-events: none; }
 
-        /* --- DROPDOWN STYLE --- */
+        /* --- DROPDOWN --- */
         .dropdown-wrapper { position: relative; padding: 0 !important; overflow: hidden; }
-
         .dropdown-wrapper select {
             background: var(--bg-block);
             border: none;
@@ -88,9 +84,7 @@
             height: 100%;
             outline: none;
         }
-
         .dropdown-wrapper select:hover { background-color: var(--bg-hover); }
-
         .dropdown-wrapper::after {
             content: "▼";
             font-size: 11px;
@@ -135,7 +129,24 @@
             border-bottom: 1px solid var(--row-border);
         }
 
-        .icon-cell { display: flex; justify-content: center; opacity: 0.8; font-size: 20px; }
+        /* Оновлена іконка-галочка */
+        .icon-cell { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+        
+        .check-icon {
+            width: 18px;
+            height: 18px;
+            stroke: var(--accent-cyan);
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 2px rgba(0, 242, 255, 0.3));
+        }
+
         .label-cell { font-size: 16px; text-transform: uppercase; }
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; }
         .val-total { color: #fff; }
@@ -220,8 +231,6 @@
                 allRowsData = json.table.rows;
 
                 const select = document.getElementById('period-select');
-                
-                // Фільтр майбутніх періодів та поточного для випадаючого списку
                 const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => {
                     if (!p) return false;
                     const parts = p.split(' ');
@@ -304,7 +313,11 @@
             rows.forEach((row, index) => {
                 const html = `
                     <div class="data-row">
-                        <div class="icon-cell">🔘</div>
+                        <div class="icon-cell">
+                            <svg class="check-icon" viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
                         <div class="label-cell">${row.c[1]?.v || '—'}</div>
                         <div class="value-cell val-total">${row.c[2]?.v || '0'}</div>
                         <div class="value-cell val-destroyed">${row.c[3]?.v || '0'}</div>
