@@ -45,7 +45,6 @@
             text-transform: uppercase; text-align: center;
         }
         .info-block:hover { background-color: var(--bg-hover); }
-        .time-date { color: var(--accent-main); font-size: 16px; line-height: 1.2; }
 
         /* --- DROPDOWN --- */
         .custom-select-wrapper { position: relative; }
@@ -115,9 +114,7 @@
             <div class="main-title">ЗВІТ ББпС <span class="title-accent">125 ОВМБр</span></div>
         </div>
         <div class="nav-blocks">
-            <div class="info-block" onclick="renderAllTimeSum()">
-                <div class="time-date">ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)</div>
-            </div>
+            <div class="info-block" onclick="renderAllTimeSum()">ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)</div>
             <div class="info-block" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
             <div class="custom-select-wrapper">
                 <div class="info-block" id="dropdown-btn">МИНУЛИЙ ПЕРІОД ▼</div>
