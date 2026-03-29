@@ -14,7 +14,6 @@
             --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #1a2222;
-            --header-h: 85px; 
         }
 
         html, body {
@@ -28,7 +27,7 @@
         /* --- HEADER --- */
         .top-nav {
             display: flex; align-items: stretch; background-color: var(--bg-dark);
-            height: var(--header-h); width: 100%; border-bottom: 2px solid var(--row-border);
+            height: 85px; width: 100%; border-bottom: 2px solid var(--row-border);
             padding: 0 25px; gap: 15px; box-sizing: border-box;
         }
 
@@ -47,7 +46,7 @@
         .info-block:hover { background-color: var(--bg-hover); }
         .time-date { color: var(--accent-main); font-size: 16px; line-height: 1.2; text-align: center; }
 
-        /* --- ПЛАВНИЙ DROPDOWN --- */
+        /* --- DROPDOWN --- */
         .custom-select-wrapper { position: relative; }
         .dropdown-content {
             display: block; position: absolute; top: 110%; left: 0; width: 100%;
@@ -62,7 +61,7 @@
         }
         .dropdown-item:hover { color: var(--accent-main); background: var(--bg-hover); }
 
-        /* --- TOP STATS --- */
+        /* --- TOP STATS (Оновлено стилі тексту) --- */
         .top-stats-container {
             display: flex; justify-content: center; gap: 10px; width: 100%;
             max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box;
@@ -72,8 +71,16 @@
             justify-content: center; align-items: center; padding: 25px 20px; gap: 35px;
         }
         .stat-item { text-align: center; position: relative; }
-        .stat-value { font-size: 42px; color: var(--accent-main); display: block; }
-        .stat-label { font-size: 14px; text-transform: lowercase; }
+        .stat-value { font-size: 42px; color: var(--accent-main); display: block; font-weight: 700; }
+        
+        .stat-label { 
+            font-size: 16px; 
+            text-transform: uppercase; 
+            color: var(--text-white);
+            font-weight: 700;
+            display: block;
+            margin-top: 5px;
+        }
 
         /* --- TABLE --- */
         .stats-wrapper { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; max-width: 1350px; width: 100%; margin: 30px auto; padding: 0 20px; box-sizing: border-box; }
@@ -82,7 +89,7 @@
         .table-header {
             display: grid; grid-template-columns: 1fr 180px; 
             padding-bottom: 8px; border-bottom: 1px solid var(--row-border);
-            color: var(--accent-main); font-size: 13px; text-transform: lowercase;
+            color: var(--accent-main); font-size: 14px; text-transform: lowercase;
         }
         .header-labels { display: flex; justify-content: space-between; text-align: center; }
         .header-labels div { width: 85px; }
@@ -93,8 +100,6 @@
         }
         .check-icon { width: 18px; stroke: var(--accent-main); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
-        
-        /* Усі цифри в таблиці завжди білі */
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; }
 
         @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } }
@@ -108,7 +113,9 @@
             <div class="main-title">ЗВІТ ББпС <span class="title-accent">125 ОВМБр</span></div>
         </div>
         <div class="nav-blocks">
-            <div class="info-block" onclick="renderAllTimeSum()"><div class="time-date">За весь час<br>(з 01.01.2026)</div></div>
+            <div class="info-block" onclick="renderAllTimeSum()">
+                <div class="time-date">ЗА ВЕСЬ ЧАС<br>(З 01.01.2026)</div>
+            </div>
             <div class="info-block" onclick="renderCurrentMonth()" id="current-month-btn">БЕРЕЗЕНЬ</div>
             <div class="custom-select-wrapper">
                 <div class="info-block" id="dropdown-btn">МИНУЛИЙ ПЕРІОД ▼</div>
@@ -203,28 +210,40 @@
         }
 
         function calculateTopStats(filterValue) {
-            let hits = 0, dests = 0, strike = 0, recon = 0, pDest = 0, pWound = 0;
+            let hits = 0, dests = 0, strike = 0, recon = 0, pDest = 0, pWoundRaw = 0;
+
             allRowsRaw.forEach(r => {
                 if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
                     const label = r.c[1]?.v || "";
-                    const vC = parseInt(r.c[2]?.v) || 0;
-                    const vD = parseInt(r.c[3]?.v) || 0;
-                    hits += vC; dests += vD;
-                    if (label.includes("ОС РОВ")) { pDest += vD; pWound += vC; }
+                    const vC = parseInt(r.c[2]?.v) || 0; // Уражено
+                    const vD = parseInt(r.c[3]?.v) || 0; // Знищено
+                    
+                    hits += vC; 
+                    dests += vD;
+
+                    if (label.includes("ОС РОВ")) { 
+                        pDest += vD;     // Тільки знищені
+                        pWoundRaw += vC; // Тільки уражені
+                    }
                 }
-                // Логіка вильотів: Місяць у F(5), Ударні у G(6), Розвідка у H(7)
                 if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
                     strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
                 }
             });
+
             animateNumber(document.getElementById('total-hit'), hits);
             animateNumber(document.getElementById('total-dest'), dests);
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
-            animateNumber(document.getElementById('personnel-hit'), pDest + pWound);
+
+            // Оновлена логіка ОС РОВ:
+            // "ОС РОВ" (загалом) = уражені + знищені
+            // "в т.ч. знищено" = знищені
+            // "поранено" = уражені
+            animateNumber(document.getElementById('personnel-hit'), pDest + pWoundRaw);
             animateNumber(document.getElementById('personnel-dest'), pDest);
-            animateNumber(document.getElementById('personnel-wounded'), pWound);
+            animateNumber(document.getElementById('personnel-wounded'), pWoundRaw);
         }
 
         function renderCurrentMonth() { renderData(currentSearchString); }
