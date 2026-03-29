@@ -40,11 +40,12 @@
         .info-block {
             background-color: var(--bg-block); height: 58px; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
-            padding: 0 25px; min-width: 150px; border-radius: 2px; cursor: pointer; 
-            transition: background 0.2s; color: var(--text-white); font-weight: 700; text-transform: uppercase;
+            padding: 0 25px; min-width: 160px; border-radius: 2px; cursor: pointer; 
+            transition: background 0.2s; color: var(--text-white); font-weight: 700; 
+            text-transform: uppercase; text-align: center;
         }
         .info-block:hover { background-color: var(--bg-hover); }
-        .time-date { color: var(--accent-main); font-size: 16px; line-height: 1.2; text-align: center; }
+        .time-date { color: var(--accent-main); font-size: 16px; line-height: 1.2; }
 
         /* --- DROPDOWN --- */
         .custom-select-wrapper { position: relative; }
@@ -57,11 +58,11 @@
         .dropdown-content.show { opacity: 1; visibility: visible; transform: translateY(0); }
         .dropdown-item {
             padding: 15px; text-align: center; border-bottom: 1px solid #1a2222;
-            transition: color 0.2s; cursor: pointer;
+            transition: color 0.2s; cursor: pointer; font-size: 14px;
         }
         .dropdown-item:hover { color: var(--accent-main); background: var(--bg-hover); }
 
-        /* --- TOP STATS (Оновлено стилі тексту) --- */
+        /* --- TOP STATS --- */
         .top-stats-container {
             display: flex; justify-content: center; gap: 10px; width: 100%;
             max-width: 1350px; margin-top: 15px; padding: 0 20px; box-sizing: border-box;
@@ -80,6 +81,7 @@
             font-weight: 700;
             display: block;
             margin-top: 5px;
+            letter-spacing: 0.5px;
         }
 
         /* --- TABLE --- */
@@ -102,7 +104,7 @@
         .label-cell { font-size: 16px; text-transform: uppercase; font-weight: 700; }
         .value-cell { text-align: center; font-size: 22px; font-weight: 700; color: #ffffff; }
 
-        @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } }
+        @media (max-width: 1100px) { .top-nav { height: auto; flex-direction: column; padding: 20px; } .top-stats-container { flex-direction: column; } .nav-blocks { justify-content: center; margin-top: 10px; } }
     </style>
 </head>
 <body>
@@ -210,9 +212,11 @@
         }
 
         function calculateTopStats(filterValue) {
-            let hits = 0, dests = 0, strike = 0, recon = 0, pDest = 0, pWoundRaw = 0;
+            let hits = 0, dests = 0, strike = 0, recon = 0;
+            let pTotalHit = 0, pDestroyed = 0;
 
             allRowsRaw.forEach(r => {
+                // ТЕХНІКА ТА ОС (Фільтр по стовпцю A - індекс 0)
                 if (r.c[0]?.v === filterValue || filterValue === "ВСІ") {
                     const label = r.c[1]?.v || "";
                     const vC = parseInt(r.c[2]?.v) || 0; // Уражено
@@ -222,10 +226,11 @@
                     dests += vD;
 
                     if (label.includes("ОС РОВ")) { 
-                        pDest += vD;     // Тільки знищені
-                        pWoundRaw += vC; // Тільки уражені
+                        pTotalHit += vC;     // Всі уражені за період
+                        pDestroyed += vD;    // Тільки знищені за період
                     }
                 }
+                // ВИЛЬОТИ (Фільтр по стовпцю F - індекс 5, G - ударні, H - розвідка)
                 if (r.c[5]?.v === filterValue || filterValue === "ВСІ") {
                     strike += (r.c[6] && typeof r.c[6].v === 'number') ? r.c[6].v : 0;
                     recon += (r.c[7] && typeof r.c[7].v === 'number') ? r.c[7].v : 0;
@@ -237,13 +242,13 @@
             animateNumber(document.getElementById('strike-sorties'), strike);
             animateNumber(document.getElementById('recon-sorties'), recon);
 
-            // Оновлена логіка ОС РОВ:
-            // "ОС РОВ" (загалом) = уражені + знищені
-            // "в т.ч. знищено" = знищені
-            // "поранено" = уражені
-            animateNumber(document.getElementById('personnel-hit'), pDest + pWoundRaw);
-            animateNumber(document.getElementById('personnel-dest'), pDest);
-            animateNumber(document.getElementById('personnel-wounded'), pWoundRaw);
+            // ЛОГІКА ОС РОВ:
+            // "ОС РОВ" = загальна кількість уражених за період
+            animateNumber(document.getElementById('personnel-hit'), pTotalHit);
+            // "в т.ч. знищено" = тільки знищені за період
+            animateNumber(document.getElementById('personnel-dest'), pDestroyed);
+            // "поранено" = уражені мінус знищені
+            animateNumber(document.getElementById('personnel-wounded'), pTotalHit - pDestroyed);
         }
 
         function renderCurrentMonth() { renderData(currentSearchString); }
