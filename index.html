@@ -11,7 +11,7 @@
             --bg-dark: #020606;
             --bg-block: #0d1212;
             --bg-hover: #161d1d;
-            --accent-main: rgb(249 148 23); /* Оновлений колір */
+            --accent-main: rgb(249 148 23); 
             --text-white: #ffffff;
             --row-border: #0a1111;
             --header-h: 85px; 
@@ -69,14 +69,8 @@
         .info-block:hover { background-color: var(--bg-hover); }
         .time-date { color: #ffffff; font-size: 17px; line-height: 1.2; text-align: center; pointer-events: none; }
 
-        /* --- DROPDOWN STYLES --- */
-        .dropdown-wrapper {
-            position: relative;
-            padding: 0 !important;
-            display: flex;
-            align-items: center;
-        }
-        
+        /* --- DROPDOWN --- */
+        .dropdown-wrapper { position: relative; padding: 0 !important; }
         .dropdown-wrapper select {
             background: transparent;
             border: none;
@@ -92,7 +86,6 @@
             outline: none;
             text-transform: uppercase;
         }
-
         .dropdown-wrapper::after {
             content: "▼";
             font-size: 12px;
@@ -202,7 +195,7 @@
             <div class="info-block" onclick="renderAllTimeSum()" title="За весь час">
                 <div id="clock" class="time-date">--:--:-- --<br>--.--.----</div>
             </div>
-            <div class="info-block" onclick="renderCurrentMonth()"><span id="month-label">Березень</span></div>
+            <div class="info-block" onclick="renderCurrentMonth()"><span id="month-label">--</span></div>
             <div class="info-block dropdown-wrapper">
                 <select id="period-select" onchange="renderData(this.value)">
                     <option value="" disabled selected>Період</option>
@@ -253,9 +246,7 @@
         setInterval(updateClock, 1000); updateClock();
 
         function animateNumber(el, target) {
-            let start = 0;
-            const duration = 800;
-            const startTime = performance.now();
+            let start = 0; const duration = 800; const startTime = performance.now();
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
@@ -270,15 +261,14 @@
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
             document.getElementById('month-label').textContent = monthsNames[now.getMonth()];
-
+            
             try {
                 const response = await fetch(url);
                 const text = await response.text();
                 const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
                 
                 allRowsData = json.table.rows.filter(row => {
-                    const p = row.c[0]?.v;
-                    if (!p) return false;
+                    const p = row.c[0]?.v; if (!p) return false;
                     const parts = p.split(' ');
                     const mIdx = monthsNames.indexOf(parts[0]);
                     const yNum = parseInt(parts[1]);
@@ -300,28 +290,34 @@
             } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА ТАБЛИЦІ'; }
         }
 
-        function calculateTopStats(rows) {
+        function calculateTopStats(rows, filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, persHit = 0, persDest = 0, persWound = 0;
 
+            // 1. Рахуємо цілі (сумуємо ВСЕ, включаючи ОС РОВ)
             rows.forEach(row => {
                 const label = row.c[1]?.v || "";
                 const valC = parseInt(row.c[2]?.v) || 0; // Col C
                 const valD = parseInt(row.c[3]?.v) || 0; // Col D
-                const valG = parseInt(row.c[6]?.v) || 0; // Col G
-                const valH = parseInt(row.c[7]?.v) || 0; // Col H
                 const valI = parseInt(row.c[8]?.v) || 0; // Col I
 
+                // Додаємо до загального лічильника
+                hits += valC;
+                dests += valD;
+
+                // Окремо накопичуємо для картки ОС РОВ
                 if (label.includes("ОС РОВ")) {
                     persHit += valC;
                     persDest += valD;
                     persWound += valI;
-                } else {
-                    // Сумуємо техніку та об'єкти
-                    hits += valC;
-                    dests += valD;
-                    // Сумуємо вильоти (зазвичай вони в окремих рядках або паралельно)
-                    strike += valG;
-                    recon += valH;
+                }
+            });
+
+            // 2. Рахуємо вильоти окремо (колонки F, G, H)
+            allRowsData.forEach(row => {
+                const colF = row.c[5]?.v; 
+                if (colF === filterValue || (filterValue === "ВСІ" && colF)) {
+                    strike += (parseInt(row.c[6]?.v) || 0); // Col G
+                    recon += (parseInt(row.c[7]?.v) || 0);  // Col H
                 }
             });
 
@@ -340,17 +336,15 @@
             const summary = {};
             allRowsData.forEach(row => {
                 const label = row.c[1]?.v; if (!label) return;
-                if (!summary[label]) summary[label] = { c: 0, d: 0, g: 0, h: 0, i: 0 };
+                if (!summary[label]) summary[label] = { c: 0, d: 0, i: 0 };
                 summary[label].c += (parseInt(row.c[2]?.v) || 0);
                 summary[label].d += (parseInt(row.c[3]?.v) || 0);
-                summary[label].g += (parseInt(row.c[6]?.v) || 0);
-                summary[label].h += (parseInt(row.c[7]?.v) || 0);
                 summary[label].i += (parseInt(row.c[8]?.v) || 0);
             });
             const rows = Object.keys(summary).map(k => ({ 
-                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}, null, null, {v: summary[k].g}, {v: summary[k].h}, {v: summary[k].i}] 
+                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}, null, null, null, null, {v: summary[k].i}] 
             }));
-            display(rows, "ЗАГАЛЬНИЙ ЗВІТ");
+            display(rows, "ВСІ");
         }
 
         function renderData(filterValue) {
@@ -358,8 +352,8 @@
             display(filtered, filterValue);
         }
 
-        function display(rows, title) {
-            calculateTopStats(rows);
+        function display(rows, filterValue) {
+            calculateTopStats(rows, filterValue);
             const colLeft = document.getElementById('col-left');
             const colRight = document.getElementById('col-right');
             colLeft.innerHTML = ''; colRight.innerHTML = '';
@@ -377,8 +371,8 @@
 
             const half = Math.ceil(rows.length / 2);
             rows.forEach((row, index) => {
-                const val1 = parseInt(row.c[2]?.v) || 0;
-                const val2 = parseInt(row.c[3]?.v) || 0;
+                const v1 = parseInt(row.c[2]?.v) || 0;
+                const v2 = parseInt(row.c[3]?.v) || 0;
                 const html = `
                     <div class="data-row" style="animation-delay: ${index * 0.05}s">
                         <div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
@@ -388,8 +382,10 @@
                     </div>`;
                 if (index < half) colLeft.innerHTML += html; else colRight.innerHTML += html;
                 setTimeout(() => {
-                    animateNumber(document.getElementById(`v1-${index}`), val1);
-                    animateNumber(document.getElementById(`v2-${index}`), val2);
+                    const el1 = document.getElementById(`v1-${index}`);
+                    const el2 = document.getElementById(`v2-${index}`);
+                    if(el1) animateNumber(el1, v1);
+                    if(el2) animateNumber(el2, v2);
                 }, 100);
             });
         }
