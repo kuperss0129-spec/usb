@@ -74,7 +74,7 @@
         .dropdown-item:last-child { border-bottom: none; }
         .dropdown-item:hover { background-color: var(--bg-hover); color: var(--accent-main); }
 
-        /* --- TOP STATS (Orange Numbers, White Labels) --- */
+        /* --- TOP STATS --- */
         .top-stats-container {
             display: flex; justify-content: center; gap: 10px; width: 100%;
             max-width: 1350px; margin-top: 15px; padding: 0 20px;
@@ -187,7 +187,7 @@
 
     <script>
         const monthsNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
-        let allRowsData = [];
+        let allRowsData = []; // Усі валідні рядки з таблиці
         const now = new Date();
         const currentMonthIdx = now.getMonth();
         const currentYear = now.getFullYear();
@@ -225,7 +225,7 @@
                 const text = await response.text();
                 const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
                 
-                // Фільтрація: Тільки минулі та поточний періоди
+                // Фільтруємо: Тільки минуле та теперішнє
                 allRowsData = json.table.rows.filter(row => {
                     const period = row.c[0]?.v;
                     if (!period) return false;
@@ -235,13 +235,13 @@
                     return year < currentYear || (year === currentYear && mIdx <= currentMonthIdx);
                 });
 
-                const pastPeriods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => p !== currentSearchString);
-                pastPeriods.sort((a, b) => {
+                const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => p !== currentSearchString);
+                periods.sort((a, b) => {
                     const [mA, yA] = a.split(' '), [mB, yB] = b.split(' ');
                     return (parseInt(yB) - parseInt(yA)) || (monthsNames.indexOf(mB) - monthsNames.indexOf(mA));
                 });
 
-                pastPeriods.forEach(p => {
+                periods.forEach(p => {
                     const div = document.createElement('div');
                     div.className = 'dropdown-item';
                     div.textContent = p;
@@ -253,19 +253,29 @@
             } catch (e) { document.getElementById('status-msg').innerText = 'ПОМИЛКА ТАБЛИЦІ'; }
         }
 
-        function calculateTopStats(rows, filterValue) {
+        function calculateTopStats(filteredRows, filterValue) {
             let hits = 0, dests = 0, strike = 0, recon = 0, persDest = 0, persWound = 0;
-            rows.forEach(row => {
+
+            // 1. Рахуємо ураження з відфільтрованих для таблиці рядків
+            filteredRows.forEach(row => {
                 const label = row.c[1]?.v || "";
                 const valC = parseInt(row.c[2]?.v) || 0;
                 const valD = parseInt(row.c[3]?.v) || 0;
-                hits += valC; dests += valD;
-                if (label.includes("ОС РОВ")) { persDest = valD; persWound = valC; }
+                
+                hits += valC; 
+                dests += valD;
+
+                if (label.includes("ОС РОВ")) { 
+                    persDest = valD; 
+                    persWound = valC; 
+                }
             });
 
+            // 2. Рахуємо вильоти (вони можуть бути в окремих рядках, тому шукаємо по всьому масиву періоду)
             allRowsData.forEach(row => {
                 if (row.c[0]?.v === filterValue || filterValue === "ВСІ") {
-                    strike += (parseInt(row.c[6]?.v) || 0); recon += (parseInt(row.c[7]?.v) || 0);  
+                    strike += (parseInt(row.c[6]?.v) || 0); 
+                    recon += (parseInt(row.c[7]?.v) || 0);  
                 }
             });
 
@@ -279,6 +289,7 @@
         }
 
         function renderCurrentMonth() { renderData(currentSearchString); }
+        
         function renderAllTimeSum() {
             const summary = {};
             allRowsData.forEach(row => {
@@ -287,7 +298,9 @@
                 summary[label].c += (parseInt(row.c[2]?.v) || 0);
                 summary[label].d += (parseInt(row.c[3]?.v) || 0);
             });
-            const rows = Object.keys(summary).map(k => ({ c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}] }));
+            const rows = Object.keys(summary).map(k => ({ 
+                c: [null, {v: k}, {v: summary[k].c}, {v: summary[k].d}] 
+            }));
             display(rows, "ВСІ");
         }
 
@@ -303,6 +316,7 @@
             document.getElementById('status-msg').style.display = 'none';
             document.getElementById('main-wrapper').style.display = 'flex';
             document.getElementById('top-stats').style.display = 'flex';
+
             const half = Math.ceil(rows.length / 2);
             rows.forEach((row, index) => {
                 const v1 = parseInt(row.c[2]?.v) || 0, v2 = parseInt(row.c[3]?.v) || 0;
