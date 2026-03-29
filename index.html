@@ -101,7 +101,7 @@
             background-color: #222;
         }
 
-        .stat-value { font-size: 36px; font-weight: 700; display: block; margin-bottom: 5px; }
+        .stat-value { font-size: 36px; font-weight: 700; display: block; margin-bottom: 5px; min-width: 50px; }
         .stat-label { color: var(--accent-cyan); font-size: 14px; text-transform: lowercase; }
 
         /* --- TABLE --- */
@@ -134,7 +134,10 @@
             align-items: center;
             padding: 14px 0;
             border-bottom: 1px solid var(--row-border);
+            animation: fadeIn 0.5s ease-out;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .check-icon { width: 18px; height: 18px; stroke: var(--accent-cyan); stroke-width: 3; fill: none; }
         .label-cell { font-size: 16px; text-transform: uppercase; }
@@ -182,17 +185,17 @@
 
     <div class="top-stats-container" id="top-stats" style="display: none;">
         <div class="stat-card">
-            <div class="stat-item"><span class="stat-value" id="total-hit">0</span><span class="stat-label">уражено цілей</span></div>
-            <div class="stat-item"><span class="stat-value" id="total-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="total-hit">0</span><span class="stat-label">уражено цілей</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="total-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
         </div>
         <div class="stat-card">
-            <div class="stat-item"><span class="stat-value" id="strike-sorties">0</span><span class="stat-label">ударних вильотів</span></div>
-            <div class="stat-item"><span class="stat-value" id="recon-sorties">0</span><span class="stat-label">розвід. вильотів</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="strike-sorties">0</span><span class="stat-label">ударних вильотів</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="recon-sorties">0</span><span class="stat-label">розвід. вильотів</span></div>
         </div>
         <div class="stat-card">
-            <div class="stat-item"><span class="stat-value" id="personnel-hit">0</span><span class="stat-label">ОС РОВ</span></div>
-            <div class="stat-item"><span class="stat-value" id="personnel-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
-            <div class="stat-item"><span class="stat-value" id="personnel-wounded">0</span><span class="stat-label">в т.ч. поранено</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="personnel-hit">0</span><span class="stat-label">ОС РОВ</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="personnel-dest">0</span><span class="stat-label">в т.ч. знищено</span></div>
+            <div class="stat-item"><span class="stat-value animate-num" id="personnel-wounded">0</span><span class="stat-label">в т.ч. поранено</span></div>
         </div>
     </div>
 
@@ -213,7 +216,9 @@
         const monthsNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
         let allRowsData = [];
         const now = new Date();
-        const currentSearchString = `${monthsNames[now.getMonth()]} ${now.getFullYear()}`;
+        const currentMonthIdx = now.getMonth();
+        const currentYear = now.getFullYear();
+        const currentSearchString = `${monthsNames[currentMonthIdx]} ${currentYear}`;
 
         function updateClock() {
             const d = new Date(); const days = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
@@ -221,19 +226,53 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
+        // ФУНКЦІЯ АНІМАЦІЇ ЧИСЕЛ
+        function animateNumber(el, target) {
+            let start = 0;
+            const duration = 1000;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // easeOutQuad для плавності в кінці
+                const ease = progress * (2 - progress);
+                const current = Math.floor(ease * target);
+                el.textContent = current;
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
         async function fetchData() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            
+            document.getElementById('month-label').textContent = monthsNames[currentMonthIdx];
+
             try {
                 const response = await fetch(url);
                 const text = await response.text();
                 const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
-                allRowsData = json.table.rows;
+                
+                // Фільтр майбутнього
+                allRowsData = json.table.rows.filter(row => {
+                    const period = row.c[0]?.v;
+                    if (!period) return false;
+                    const parts = period.split(' ');
+                    const mIdx = monthsNames.indexOf(parts[0]);
+                    const yNum = parseInt(parts[1]);
+                    return yNum < currentYear || (yNum === currentYear && mIdx <= currentMonthIdx);
+                });
 
                 const select = document.getElementById('period-select');
-                const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => p && p !== currentSearchString);
-                periods.forEach(p => {
+                const pastPeriods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => p !== currentSearchString);
+                
+                pastPeriods.sort((a, b) => {
+                    const pA = a.split(' '); const pB = b.split(' ');
+                    return (parseInt(pB[1]) - parseInt(pA[1])) || (monthsNames.indexOf(pB[0]) - monthsNames.indexOf(pA[0]));
+                });
+
+                pastPeriods.forEach(p => {
                     const opt = document.createElement('option'); opt.value = p; opt.textContent = p; select.appendChild(opt);
                 });
 
@@ -246,38 +285,29 @@
 
             rows.forEach(row => {
                 const label = row.c[1]?.v || "";
-                
-                // Згідно з твоїм описом:
-                // Уражено цілей - Код С (індекс 2), Знищено - Код D (індекс 3)
-                // Ударні вильоти - Код G (індекс 6), Розвід. вильоти - Код H (індекс 7)
-                const cVal = parseInt(row.c[2]?.v) || 0; // Col C
-                const dVal = parseInt(row.c[3]?.v) || 0; // Col D
-                const gVal = parseInt(row.c[6]?.v) || 0; // Col G
-                const hVal = parseInt(row.c[7]?.v) || 0; // Col H
-                const iVal = parseInt(row.c[8]?.v) || 0; // Col I (можливо для поранених)
+                const valC = parseInt(row.c[2]?.v) || 0;
+                const valD = parseInt(row.c[3]?.v) || 0;
+                const valG = parseInt(row.c[6]?.v) || 0;
+                const valH = parseInt(row.c[7]?.v) || 0;
+                const valI = parseInt(row.c[8]?.v) || 0;
 
                 if (label.includes("ОС РОВ")) {
-                    persHit += cVal; // уражено
-                    persDest += dVal; // знищено
-                    persWound += iVal; // поранено (з припущенням на Col I)
+                    persHit += valC; persDest += valD; persWound += valI;
                 } else {
-                    hits += cVal;
-                    dests += dVal;
-                    strike += gVal;
-                    recon += hVal;
+                    hits += valC; dests += valD; strike += valG; recon += valH;
                 }
             });
 
-            document.getElementById('total-hit').textContent = hits;
-            document.getElementById('total-dest').textContent = dests;
-            document.getElementById('strike-sorties').textContent = strike;
-            document.getElementById('recon-sorties').textContent = recon;
-            document.getElementById('personnel-hit').textContent = persHit;
-            document.getElementById('personnel-dest').textContent = persDest;
-            document.getElementById('personnel-wounded').textContent = persWound;
+            animateNumber(document.getElementById('total-hit'), hits);
+            animateNumber(document.getElementById('total-dest'), dests);
+            animateNumber(document.getElementById('strike-sorties'), strike);
+            animateNumber(document.getElementById('recon-sorties'), recon);
+            animateNumber(document.getElementById('personnel-hit'), persHit);
+            animateNumber(document.getElementById('personnel-dest'), persDest);
+            animateNumber(document.getElementById('personnel-wounded'), persWound);
         }
 
-        function renderCurrentMonth() { renderData(currentSearchString); }
+        function renderCurrentMonth() { renderData(currentSearchString); document.getElementById('period-select').selectedIndex = 0; }
 
         function renderAllTimeSum() {
             const summary = {};
@@ -320,8 +350,24 @@
 
             const half = Math.ceil(rows.length / 2);
             rows.forEach((row, index) => {
-                const html = `<div class="data-row"><div class="icon-cell"><svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="label-cell">${row.c[1]?.v || '—'}</div><div class="value-cell val-total">${row.c[2]?.v || '0'}</div><div class="value-cell val-destroyed">${row.c[3]?.v || '0'}</div></div>`;
+                const val1 = parseInt(row.c[2]?.v) || 0;
+                const val2 = parseInt(row.c[3]?.v) || 0;
+                const html = `
+                    <div class="data-row">
+                        <div class="icon-cell">
+                            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div class="label-cell">${row.c[1]?.v || '—'}</div>
+                        <div class="value-cell val-total" id="v1-${index}">0</div>
+                        <div class="value-cell val-destroyed" id="v2-${index}">0</div>
+                    </div>`;
                 if (index < half) colLeft.innerHTML += html; else colRight.innerHTML += html;
+                
+                // Анімація чисел в таблиці після рендеру
+                setTimeout(() => {
+                    animateNumber(document.getElementById(`v1-${index}`), val1);
+                    animateNumber(document.getElementById(`v2-${index}`), val2);
+                }, 50);
             });
         }
 
