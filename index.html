@@ -10,10 +10,10 @@
         :root {
             --bg-dark: #020606;
             --bg-block: #0d1212;
+            --bg-hover: #161d1d;
             --accent-cyan: #00f2ff;
             --text-white: #ffffff;
             --row-border: #0a1111;
-            /* Збільшення хедера на 10% */
             --header-h: 77px; 
             --font-main: 31px;
             --font-blocks: 20px;
@@ -29,14 +29,10 @@
             padding: 0;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+        body { display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        * { box-sizing: border-box; }
 
-        /* --- HEADER (+10% РОЗМІРИ) --- */
+        /* --- HEADER --- */
         .top-nav {
             display: flex;
             align-items: stretch;
@@ -48,34 +44,15 @@
             gap: 12px;
         }
 
-        .nav-logo-section {
-            display: flex;
-            align-items: center;
-            gap: 17px;
-            padding-right: 22px;
-        }
-
-        .main-title {
-            font-size: var(--font-main);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            cursor: default;
-        }
-
+        .nav-logo-section { display: flex; align-items: center; gap: 17px; padding-right: 22px; }
+        .main-title { font-size: var(--font-main); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
         .title-cyan { color: var(--accent-cyan); }
 
-        .nav-blocks {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-grow: 1;
-            justify-content: flex-end;
-        }
+        .nav-blocks { display: flex; align-items: center; gap: 10px; flex-grow: 1; justify-content: flex-end; }
 
         .info-block {
             background-color: var(--bg-block);
-            height: 55px; /* +10% */
+            height: 55px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -86,27 +63,17 @@
             border-radius: 2px;
             cursor: pointer;
             transition: background 0.2s;
-            border: 1px solid transparent;
         }
 
-        .info-block:hover { background-color: #161d1d; border-color: #1a2525; }
+        .info-block:hover { background-color: var(--bg-hover); }
 
-        .time-date {
-            color: var(--accent-cyan);
-            font-size: 15.5px;
-            line-height: 1.2;
-            text-align: center;
-            pointer-events: none;
-        }
+        .time-date { color: var(--accent-cyan); font-size: 15.5px; line-height: 1.2; text-align: center; pointer-events: none; }
 
-        /* СТИЛІЗАЦІЯ ВИПАДАЮЧОГО СПИСКУ */
-        .dropdown-wrapper {
-            position: relative;
-            padding: 0 !important; /* Щоб select займав весь простір */
-        }
+        /* --- СТИЛЬ ВИПАДАЮЧОГО СПИСКУ (ЯК НА СКРІНШОТІ) --- */
+        .dropdown-wrapper { position: relative; padding: 0 !important; overflow: hidden; }
 
         .dropdown-wrapper select {
-            background: transparent;
+            background: var(--bg-block);
             border: none;
             color: white;
             font-family: inherit;
@@ -120,9 +87,19 @@
             outline: none;
         }
 
+        /* Стилізація пунктів меню (працює в більшості браузерів) */
+        .dropdown-wrapper select option {
+            background-color: var(--bg-block);
+            color: white;
+            padding: 15px;
+            border-bottom: 1px solid var(--row-border);
+        }
+
+        .dropdown-wrapper select:hover { background-color: var(--bg-hover); }
+
         .dropdown-wrapper::after {
             content: "▼";
-            font-size: 12px;
+            font-size: 10px;
             color: #555;
             position: absolute;
             right: 18px;
@@ -173,8 +150,9 @@
         #status-msg { text-align: center; padding: 50px; color: var(--accent-cyan); text-transform: uppercase; }
 
         @media (max-width: 950px) {
-            .top-nav { height: auto; flex-direction: column; padding: 15px; }
-            .nav-blocks { width: 100%; justify-content: center; flex-wrap: wrap; }
+            .top-nav { height: auto; flex-direction: column; padding: 15px; gap: 10px; }
+            .nav-blocks { width: 100%; justify-content: center; }
+            .info-block { width: 100%; }
         }
     </style>
 </head>
@@ -185,15 +163,15 @@
             <svg width="35" height="35" viewBox="0 0 100 100" fill="white">
                 <path d="M50 5L15 30V70L50 95L85 70V30L50 5ZM50 15L75 32V68L50 85L25 68V32L50 15Z"/>
             </svg>
-            <div class="main-title">ЗВІТ <span class="title-cyan">ББпС 125 ОВМБр</span></div>
+            <div class="main-title">ЗВІТ <span class="title-cyan">УГРУПОВАННЯ СБС</span></div>
         </div>
 
         <div class="nav-blocks">
-            <div class="info-block" onclick="renderAllTimeSum()" title="Показати загальну суму">
+            <div class="info-block" onclick="renderAllTimeSum()">
                 <div id="clock" class="time-date">--:--:-- --<br>--.--.----</div>
             </div>
             
-            <div class="info-block" id="current-month-block" onclick="renderCurrentMonth()">
+            <div class="info-block" onclick="renderCurrentMonth()">
                 <span id="month-label">Березень</span>
             </div>
 
@@ -222,7 +200,9 @@
         const monthsNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
         let allRowsData = [];
         const now = new Date();
-        const currentSearchString = `${monthsNames[now.getMonth()]} ${now.getFullYear()}`;
+        const currentMonthIdx = now.getMonth();
+        const currentYear = now.getFullYear();
+        const currentSearchString = `${monthsNames[currentMonthIdx]} ${currentYear}`;
 
         function updateClock() {
             const d = new Date();
@@ -237,7 +217,7 @@
         async function fetchData() {
             const sheetId = '19JMsWCfWtKZ1bqISDD4WGfV9WUvAtZI8HEgfszI8UAk';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            document.getElementById('month-label').textContent = monthsNames[now.getMonth()];
+            document.getElementById('month-label').textContent = monthsNames[currentMonthIdx];
 
             try {
                 const response = await fetch(url);
@@ -245,11 +225,31 @@
                 const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
                 allRowsData = json.table.rows;
 
-                const periods = [...new Set(allRowsData.map(r => r.c[0] ? r.c[0].v : null))].filter(p => p && p !== currentSearchString);
                 const select = document.getElementById('period-select');
+                
+                // Отримуємо унікальні періоди та фільтруємо МАЙБУТНІ
+                const periods = [...new Set(allRowsData.map(r => r.c[0]?.v))].filter(p => {
+                    if (!p) return false;
+                    const [pMonth, pYear] = p.split(' ');
+                    const pMonthIdx = monthsNames.indexOf(pMonth);
+                    const pYearNum = parseInt(pYear);
+
+                    // Умова: період не майбутній і не поточний (для списку "Минулі")
+                    const isFuture = pYearNum > currentYear || (pYearNum === currentYear && pMonthIdx > currentMonthIdx);
+                    const isCurrent = p === currentSearchString;
+                    
+                    return !isFuture && !isCurrent;
+                });
+
+                // Сортуємо за часом (спочатку новіші)
+                periods.sort((a, b) => {
+                    const [mA, yA] = a.split(' '); const [mB, yB] = b.split(' ');
+                    return (parseInt(yB) - parseInt(yA)) || (monthsNames.indexOf(mB) - monthsNames.indexOf(mA));
+                });
+
                 periods.forEach(p => {
                     const opt = document.createElement('option');
-                    opt.value = p; opt.textContent = p;
+                    opt.value = p; opt.textContent = p; // p вже містить "Місяць Рік"
                     select.appendChild(opt);
                 });
 
@@ -267,6 +267,15 @@
         function renderAllTimeSum() {
             const summary = {};
             allRowsData.forEach(row => {
+                const p = row.c[0]?.v;
+                if (!p) return;
+                
+                // Перевірка на майбутні дати в сумі
+                const [pMonth, pYear] = p.split(' ');
+                const pMonthIdx = monthsNames.indexOf(pMonth);
+                const pYearNum = parseInt(pYear);
+                if (pYearNum > currentYear || (pYearNum === currentYear && pMonthIdx > currentMonthIdx)) return;
+
                 const label = row.c[1]?.v;
                 if (!label) return;
                 if (!summary[label]) summary[label] = { hit: 0, dest: 0 };
@@ -278,11 +287,11 @@
                 c: [null, {v: key}, {v: summary[key].hit}, {v: summary[key].dest}]
             }));
 
-            display(formattedRows, "ЗАГАЛЬНИЙ ЗВІТ (ВСЬОГО)");
+            display(formattedRows, "ЗАГАЛЬНИЙ ЗВІТ");
         }
 
         function renderData(filterValue) {
-            const filtered = allRowsData.filter(r => r.c[0] && r.c[0].v === filterValue);
+            const filtered = allRowsData.filter(r => r.c[0]?.v === filterValue);
             display(filtered, filterValue);
         }
 
